@@ -42,15 +42,19 @@ Leanote云笔记产品包括: Leanote Web & Server(即本仓库), 桌面客户�
 这里详细整理了Leanote二进版和Leanote开发版的安装教程, 请移步至:
 
 * Leanote二进制详细安装教程:
-    * [Windows](https://github.com/leanote/leanote/wiki/Leanote%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---Windows)
-    * [Mac, Linux](https://github.com/leanote/leanote/wiki/leanote%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)
+    * Mac, linux 用户
+        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
+    * Windows 用户
+        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
 * Leanote源码详细安装教程:
-    * [Windows](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)
-    * [Mac, Linux](https://github.com/leanote/leanote/wiki/leanote%E5%BC%80%E5%8F%91%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)
+    * Mac, linux 用户
+        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
+    * Windows 用户
+        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
 
 ## 4. 相关文档
 
-更多详细的安装说明、问题处理和配置说明文档，请查看 [wiki](https://github.com/leanote/leanote/wiki)。
+更多详细的安装说明、问题处理和配置说明文档，请查看 [docs](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn)。
 
 ## 5. 如何对Leanote进行二次开发
 

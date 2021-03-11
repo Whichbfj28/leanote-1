@@ -55,7 +55,7 @@ More information about how to install Leanote please see:
 
 ## 4. Documentation
 
-Please see [wiki](https://github.com/leanote/leanote/wiki) for detailed instruction on how to install Leanote on various platforms, trouble shooting and configuration explanations.
+Please see [docs](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn) for detailed instruction on how to install Leanote on various platforms, trouble shooting and configuration explanations.
 
 
 ## 5. How to develop Leanote
