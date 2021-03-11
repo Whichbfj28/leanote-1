@@ -1,11 +1,12 @@
 package admin
 
 import (
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
 	"strconv"
 	"strings"
+
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"github.com/revel/revel"
 )
 
 // admin 首页

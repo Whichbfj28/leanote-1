@@ -1,14 +1,15 @@
 package service
 
 import (
-	"github.com/leanote/leanote/app/db"
-	. "github.com/leanote/leanote/app/lea"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/coocn-cn/leanote/app/db"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // init service, for share service bettween services

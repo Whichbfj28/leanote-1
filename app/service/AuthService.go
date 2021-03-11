@@ -2,14 +2,15 @@ package service
 
 import (
 	"gopkg.in/mgo.v2/bson"
-	//	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
+	//	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
 	//	"github.com/revel/revel"
 	"errors"
 	"fmt"
-	. "github.com/leanote/leanote/app/lea"
 	"strconv"
 	"strings"
+
+	. "github.com/coocn-cn/leanote/app/lea"
 )
 
 // 登录与权限 Login & Register

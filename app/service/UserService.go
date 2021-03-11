@@ -1,12 +1,13 @@
 package service
 
 import (
-	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"gopkg.in/mgo.v2/bson"
 	"strings"
 	"time"
+
+	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UserService struct {

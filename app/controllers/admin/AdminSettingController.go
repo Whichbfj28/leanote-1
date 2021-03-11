@@ -2,10 +2,11 @@ package admin
 
 import (
 	"github.com/revel/revel"
-	//	. "github.com/leanote/leanote/app/lea"
+	//	. "github.com/coocn-cn/leanote/app/lea"
 	"fmt"
-	"github.com/leanote/leanote/app/info"
 	"strings"
+
+	"github.com/coocn-cn/leanote/app/info"
 )
 
 // admin 首页

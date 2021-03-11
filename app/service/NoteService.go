@@ -1,13 +1,14 @@
 package service
 
 import (
-	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"gopkg.in/mgo.v2/bson"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type NoteService struct {
@@ -83,7 +84,7 @@ func (this *NoteService) GetNoteBySrc(src, userId string) (note info.Note) {
 
 func (this *NoteService) GetNoteAndContentBySrc(src, userId string) (noteId string, noteAndContent info.NoteAndContentSep) {
 	note := this.GetNoteBySrc(src, userId)
-	if (note.NoteId != "") {
+	if note.NoteId != "" {
 		noteId = note.NoteId.Hex()
 		noteContent := this.GetNoteContent(note.NoteId.Hex(), userId)
 		return noteId, info.NoteAndContentSep{note, noteContent}
@@ -445,13 +446,13 @@ func (this *NoteService) UpdateNote(updatedUserId, noteId string, needUpdate bso
 	}
 
 	/*
-	// 这里不再判断, 因为controller已经判断了, 删除附件会新增, 所以不用判断
-	if usn > 0 && note.Usn != usn {
-		Log("有冲突!!")
-		Log(note.Usn)
-		Log(usn)
-		return false, "conflict", 0
-	}
+		// 这里不再判断, 因为controller已经判断了, 删除附件会新增, 所以不用判断
+		if usn > 0 && note.Usn != usn {
+			Log("有冲突!!")
+			Log(note.Usn)
+			Log(usn)
+			return false, "conflict", 0
+		}
 	*/
 
 	// 是否已自定义
@@ -1079,7 +1080,7 @@ func (this *NoteService) FixContent(content string, isMarkdown bool) string {
 	patterns := []map[string]string{
 		map[string]string{"src": "src", "middle": "/api/file/getImage", "param": "fileId", "to": "getImage?fileId="},
 		map[string]string{"src": "src", "middle": "/file/outputImage", "param": "fileId", "to": "getImage?fileId="},
-		
+
 		map[string]string{"src": "href", "middle": "/attach/download", "param": "attachId", "to": "getAttach?fileId="},
 		map[string]string{"src": "href", "middle": "/api/file/getAtach", "param": "fileId", "to": "getAttach?fileId="},
 

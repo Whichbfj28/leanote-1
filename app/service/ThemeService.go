@@ -3,18 +3,19 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/lea/archive"
-	"github.com/revel/revel"
-	"gopkg.in/mgo.v2/bson"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"github.com/coocn-cn/leanote/app/lea/archive"
+	"github.com/revel/revel"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // 主题
@@ -264,22 +265,20 @@ func (this *ThemeService) GetDefaultThemes() (themes []info.Theme) {
 	return
 }
 
-
 func validateFilename(filename string) bool {
 	// 防止用"../../来获取其它文件"
-	if (strings.Contains(filename, "..")) {
+	if strings.Contains(filename, "..") {
 		return false
 	}
 	return true
 }
 
-
 // 得到模板内容
 func (this *ThemeService) GetTplContent(userId, themeId, filename string) string {
-	if (!validateFilename(filename)) {
+	if !validateFilename(filename) {
 		return ""
 	}
-	
+
 	path := this.GetThemeAbsolutePath(userId, themeId) + "/" + filename
 	return GetFileStrContent(path)
 }
@@ -304,8 +303,8 @@ func (this *ThemeService) GetThemePath(userId, themeId string) string {
 
 // 更新模板内容
 func (this *ThemeService) UpdateTplContent(userId, themeId, filename, content string) (ok bool, msg string) {
-	if (!validateFilename(filename)) {
-		return 
+	if !validateFilename(filename) {
+		return
 	}
 
 	basePath := this.GetThemeAbsolutePath(userId, themeId)
@@ -344,7 +343,7 @@ func (this *ThemeService) UpdateTplContent(userId, themeId, filename, content st
 }
 
 func (this *ThemeService) DeleteTpl(userId, themeId, filename string) (ok bool) {
-	if (!validateFilename(filename)) {
+	if !validateFilename(filename) {
 		return
 	}
 

@@ -1,15 +1,19 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
 	"strings"
+
+	"github.com/revel/revel"
+
 	//	"encoding/json"
 	"fmt"
-	"github.com/leanote/leanote/app/info"
-	// . "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/lea/blog"
+
+	"github.com/coocn-cn/leanote/app/info"
+
+	// . "github.com/coocn-cn/leanote/app/lea"
+	"github.com/coocn-cn/leanote/app/lea/blog"
 	"gopkg.in/mgo.v2/bson"
-	//	"github.com/leanote/leanote/app/types"
+	//	"github.com/coocn-cn/leanote/app/types"
 	//	"io/ioutil"
 	//	"math"
 	//	"os"

@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/leanote/leanote/app/info"
-	"github.com/leanote/leanote/app/lea/i18n"
+
+	"github.com/coocn-cn/leanote/app/info"
+	"github.com/coocn-cn/leanote/app/lea/i18n"
 	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
-	//	. "github.com/leanote/leanote/app/lea"
+
+	//	. "github.com/coocn-cn/leanote/app/lea"
 	//	"io/ioutil"
 	//	"fmt"
 	"bytes"
@@ -229,7 +231,7 @@ func (c BaseController) RenderTemplateStr(templatePath string) string {
 	}
 
 	tpl := &revel.RenderTemplateResult{
-		Template:   template,
+		Template: template,
 		ViewArgs: c.ViewArgs, // 把args给它
 	}
 

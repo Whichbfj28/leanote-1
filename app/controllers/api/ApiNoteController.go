@@ -3,15 +3,17 @@ package api
 import (
 	"github.com/revel/revel"
 	//	"encoding/json"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"gopkg.in/mgo.v2/bson"
 	"os"
 	"os/exec"
+
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"gopkg.in/mgo.v2/bson"
+
 	// "strings"
-	"time"
 	"regexp"
-	//	"github.com/leanote/leanote/app/types"
+	"time"
+	//	"github.com/coocn-cn/leanote/app/types"
 	//	"io/ioutil"
 	//	"fmt"
 	//	"bytes"
@@ -168,22 +170,22 @@ func (c ApiNote) fixPostNotecontent(noteOrContent *info.ApiNote) {
 				if !file.IsAttach {
 					// <img src="https://"
 					// ![](http://demo.leanote.top/api/file/getImage?fileId=5863219465b68e4fd5000001)
-					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getImage\?fileId=`+file.LocalFileId)
+					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getImage\?fileId=` + file.LocalFileId)
 					// Log(reg)
-					noteOrContent.Content = reg.ReplaceAllString(noteOrContent.Content, `/api/file/getImage?fileId=`+file.FileId)  
+					noteOrContent.Content = reg.ReplaceAllString(noteOrContent.Content, `/api/file/getImage?fileId=`+file.FileId)
 
 					// // "http://a.com/api/file/getImage?fileId=localId" => /api/file/getImage?fileId=serverId
-					// noteOrContent.Content = strings.Replace(noteOrContent.Content, 
-					// 	baseUrl + "/api/file/getImage?fileId="+file.LocalFileId, 
+					// noteOrContent.Content = strings.Replace(noteOrContent.Content,
+					// 	baseUrl + "/api/file/getImage?fileId="+file.LocalFileId,
 					// 	"/api/file/getImage?fileId="+file.FileId, -1)
 				} else {
-					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getAttach\?fileId=`+file.LocalFileId)
+					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getAttach\?fileId=` + file.LocalFileId)
 					// Log(reg)
-					noteOrContent.Content = reg.ReplaceAllString(noteOrContent.Content, `/api/file/getAttach?fileId=`+file.FileId)  
+					noteOrContent.Content = reg.ReplaceAllString(noteOrContent.Content, `/api/file/getAttach?fileId=`+file.FileId)
 					/*
-					noteOrContent.Content = strings.Replace(noteOrContent.Content, 
-						baseUrl + "/api/file/getAttach?fileId="+file.LocalFileId, 
-						"/api/file/getAttach?fileId="+file.FileId, -1)
+						noteOrContent.Content = strings.Replace(noteOrContent.Content,
+							baseUrl + "/api/file/getAttach?fileId="+file.LocalFileId,
+							"/api/file/getAttach?fileId="+file.FileId, -1)
 					*/
 				}
 			}

@@ -2,11 +2,12 @@ package db
 
 import (
 	"fmt"
-	. "github.com/leanote/leanote/app/lea"
+	"strings"
+
+	. "github.com/coocn-cn/leanote/app/lea"
 	"github.com/revel/revel"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"strings"
 )
 
 // Init mgo and the common DAO

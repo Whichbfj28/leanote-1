@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/revel/cmd/harness"
 	"github.com/revel/revel"
 )
@@ -9,7 +10,7 @@ import (
 func main() {
 	// go run main.go
 	// 生成routes.go, main.go
-	revel.Init("", "github.com/leanote/leanote", "")
+	revel.Init("", "github.com/coocn-cn/leanote", "")
 	_, err := harness.Build() // ok, err
 	if err != nil {
 		panic(err)

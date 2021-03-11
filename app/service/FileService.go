@@ -3,16 +3,17 @@ package service
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
-	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"github.com/revel/revel"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const DEFAULT_ALBUM_ID = "52d3e8ac99c37b7f0d000001"

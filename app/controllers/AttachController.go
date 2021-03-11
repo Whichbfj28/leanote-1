@@ -6,14 +6,15 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"fmt"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"gopkg.in/mgo.v2/bson"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // 附件

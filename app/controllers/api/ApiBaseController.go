@@ -3,11 +3,14 @@ package api
 import (
 	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
+
 	//	"encoding/json"
-	"github.com/leanote/leanote/app/controllers"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
 	"os"
+
+	"github.com/coocn-cn/leanote/app/controllers"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+
 	//	"fmt"
 	"io/ioutil"
 	//	"fmt"

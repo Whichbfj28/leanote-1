@@ -4,9 +4,10 @@ import (
 	"github.com/revel/revel"
 	//	"encoding/json"
 	//	"gopkg.in/mgo.v2/bson"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	//	"github.com/leanote/leanote/app/types"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
+
+	//	"github.com/coocn-cn/leanote/app/types"
 	//	"io/ioutil"
 	//	"fmt"
 	//	"math"

@@ -1,10 +1,11 @@
 package service
 
 import (
-	"github.com/leanote/leanote/app/db"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
+	"github.com/coocn-cn/leanote/app/db"
+	"github.com/coocn-cn/leanote/app/info"
+	. "github.com/coocn-cn/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
+
 	//	"time"
 	//	"sort"
 	"strconv"
@@ -682,7 +683,7 @@ func (this *BlogService) LikeBlog(noteId, userId string) (ok bool, isLike bool) 
 		db.Delete(db.BlogLikes, bson.M{"NoteId": noteIdO, "UserId": userIdO})
 		isLike = false
 	}
-	
+
 	count := db.Count(db.BlogLikes, bson.M{"NoteId": noteIdO})
 	ok = db.UpdateByQI(db.Notes, bson.M{"_id": noteIdO}, bson.M{"LikeNum": count})
 
@@ -1108,16 +1109,16 @@ func (this *BlogService) SortSingles(userId string, singleIds []string) (ok bool
 // 得到用户的博客url
 func (this *BlogService) GetUserBlogUrl(userBlog *info.UserBlog, username string) string {
 	/*
-	if userBlog != nil {
-		if userBlog.Domain != "" && configService.AllowCustomDomain() {
-			return configService.GetUserUrl(userBlog.Domain)
-		} else if userBlog.SubDomain != "" {
-			return configService.GetUserSubUrl(userBlog.SubDomain)
+		if userBlog != nil {
+			if userBlog.Domain != "" && configService.AllowCustomDomain() {
+				return configService.GetUserUrl(userBlog.Domain)
+			} else if userBlog.SubDomain != "" {
+				return configService.GetUserSubUrl(userBlog.SubDomain)
+			}
+			if username == "" {
+				username = userBlog.UserId.Hex()
+			}
 		}
-		if username == "" {
-			username = userBlog.UserId.Hex()
-		}
-	}
 	*/
 	return configService.GetBlogUrl() + "/" + username
 }
@@ -1125,47 +1126,47 @@ func (this *BlogService) GetUserBlogUrl(userBlog *info.UserBlog, username string
 // 得到所有url
 func (this *BlogService) GetBlogUrls(userBlog *info.UserBlog, userInfo *info.User) info.BlogUrls {
 	var indexUrl, postUrl, searchUrl, cateUrl, singleUrl, tagsUrl, archiveUrl, tagPostsUrl string
-	
+
 	/*
-	if userBlog.Domain != "" && configService.AllowCustomDomain() { // http://demo.com
-		// ok
-		indexUrl = configService.GetUserUrl(userBlog.Domain)
-		cateUrl = indexUrl + "/cate"     // /xxxxx
-		postUrl = indexUrl + "/post"     // /xxxxx
-		searchUrl = indexUrl + "/search" // /xxxxx
-		singleUrl = indexUrl + "/single"
-		archiveUrl = indexUrl + "/archives"
-		tagsUrl = indexUrl + "/tags"
-		tagPostsUrl = indexUrl + "/tag"
-	} else if userBlog.SubDomain != "" { // demo.leanote.com
-		indexUrl = configService.GetUserSubUrl(userBlog.SubDomain)
-		cateUrl = indexUrl + "/cate"     // /xxxxx
-		postUrl = indexUrl + "/post"     // /xxxxx
-		searchUrl = indexUrl + "/search" // /xxxxx
-		singleUrl = indexUrl + "/single"
-		archiveUrl = indexUrl + "/archives"
-		tagsUrl = indexUrl + "/tags"
-		tagPostsUrl = indexUrl + "/tag"
-	} else {
-		*/
-		// ok
-		blogUrl := configService.GetBlogUrl() // blog.leanote.com
-		userIdOrEmail := ""
-		if userInfo.Username != "" {
-			userIdOrEmail = userInfo.Username
-		} else if userInfo.Email != "" {
-			userIdOrEmail = userInfo.Email
+		if userBlog.Domain != "" && configService.AllowCustomDomain() { // http://demo.com
+			// ok
+			indexUrl = configService.GetUserUrl(userBlog.Domain)
+			cateUrl = indexUrl + "/cate"     // /xxxxx
+			postUrl = indexUrl + "/post"     // /xxxxx
+			searchUrl = indexUrl + "/search" // /xxxxx
+			singleUrl = indexUrl + "/single"
+			archiveUrl = indexUrl + "/archives"
+			tagsUrl = indexUrl + "/tags"
+			tagPostsUrl = indexUrl + "/tag"
+		} else if userBlog.SubDomain != "" { // demo.leanote.com
+			indexUrl = configService.GetUserSubUrl(userBlog.SubDomain)
+			cateUrl = indexUrl + "/cate"     // /xxxxx
+			postUrl = indexUrl + "/post"     // /xxxxx
+			searchUrl = indexUrl + "/search" // /xxxxx
+			singleUrl = indexUrl + "/single"
+			archiveUrl = indexUrl + "/archives"
+			tagsUrl = indexUrl + "/tags"
+			tagPostsUrl = indexUrl + "/tag"
 		} else {
-			userIdOrEmail = userInfo.UserId.Hex()
-		}
-		indexUrl = blogUrl + "/" + userIdOrEmail
-		cateUrl = blogUrl + "/cate/" + userIdOrEmail        // /username/notebookId
-		postUrl = blogUrl + "/post/" + userIdOrEmail        // /username/xxxxx
-		searchUrl = blogUrl + "/search/" + userIdOrEmail    // blog.leanote.com/search/username
-		singleUrl = blogUrl + "/single/" + userIdOrEmail    // blog.leanote.com/single/username/singleId
-		archiveUrl = blogUrl + "/archives/" + userIdOrEmail // blog.leanote.com/archive/username
-		tagsUrl = blogUrl + "/tags/" + userIdOrEmail
-		tagPostsUrl = blogUrl + "/tag/" + userIdOrEmail // blog.leanote.com/archive/username
+	*/
+	// ok
+	blogUrl := configService.GetBlogUrl() // blog.leanote.com
+	userIdOrEmail := ""
+	if userInfo.Username != "" {
+		userIdOrEmail = userInfo.Username
+	} else if userInfo.Email != "" {
+		userIdOrEmail = userInfo.Email
+	} else {
+		userIdOrEmail = userInfo.UserId.Hex()
+	}
+	indexUrl = blogUrl + "/" + userIdOrEmail
+	cateUrl = blogUrl + "/cate/" + userIdOrEmail        // /username/notebookId
+	postUrl = blogUrl + "/post/" + userIdOrEmail        // /username/xxxxx
+	searchUrl = blogUrl + "/search/" + userIdOrEmail    // blog.leanote.com/search/username
+	singleUrl = blogUrl + "/single/" + userIdOrEmail    // blog.leanote.com/single/username/singleId
+	archiveUrl = blogUrl + "/archives/" + userIdOrEmail // blog.leanote.com/archive/username
+	tagsUrl = blogUrl + "/tags/" + userIdOrEmail
+	tagPostsUrl = blogUrl + "/tag/" + userIdOrEmail // blog.leanote.com/archive/username
 	// }
 
 	return info.BlogUrls{
