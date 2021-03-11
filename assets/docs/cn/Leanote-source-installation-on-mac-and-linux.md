@@ -2,10 +2,6 @@
 
 `leanote` 开发版(源码)适合开发人员，或需要快速更新功能的朋友。
 
-- Mac, Linux 用户的二进制版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Mac-and-Linux)。
-- Windows 用户的源码版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)。
-- Windows 用户的二进制安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)。
-
 -----------------------------
 # 安装步骤:
 
@@ -36,7 +32,7 @@ $> tar -xzvf go1.6.linux-amd64.tar.gz
 在 `/home/user1` 下新建一个目录`gopackage`, 这里面会放`go`的包和编译后的文件：
 
 ```
-$> mkdir /home/user1/gopackage
+$> mkdir $GOPATH
 ```
 
 配置环境变量, 编辑`/etc/profile`文件：
@@ -47,7 +43,7 @@ $> sudo vim /etc/profile
 此处使用了`vim`文字编辑器，你可以使用自己喜欢的其他编辑器。在 `/etc/profile` 中添加以下几行：
 ```
 export GOROOT=/home/user1/go
-export GOPATH=/home/user1/gopackage
+export GOPATH=$GOPATH
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 ```
 
@@ -70,12 +66,7 @@ go version go1.6 linux/amd64
 
 ### 2.1 方法1 （**推荐方法**）:
 
-请下载 [leante-all-master.zip](https://github.com/leanote/leanote-all/archive/master.zip)。解压后，将`src`文件夹复制到 `/home/user1/gopackage/`
-
-使用如下命令生成`revel`二进制命令, 稍后运行`Leanote`需要用到：
-```
-$> go install github.com/revel/cmd/revel
-```
+请下载 [leante-master.zip](https://github.com/coocn-cn/leanote/archive/master.zip)。解压后，将`src`文件夹复制到`$GOPATH/src/github.com/coocn-cn/leanote`
 
 ### 2.2 方法2
 
@@ -88,15 +79,14 @@ $> sudo apt-get install git-core openssh-server openssh-client
 
 - `centos`下安装`git`: 请参考: http://www.ccvita.com/370.html
 
-获取`Revel`和`Leanote`:
+获取`Leanote`:
 
-打开终端, 以下命令会下载`Revel`和`Leanote`及依赖包, 时间可能会有点久, 请耐心等待。
+打开终端, 以下命令会下载`Leanote`及依赖包, 时间可能会有点久, 请耐心等待。
 ```
-$> go get github.com/revel/cmd/revel
-$> go get github.com/leanote/leanote/app
+$> go get github.com/coocn-cn/leanote
 ```
 
-下载完成后，`Leanote`的源码在`/home/user1/gopackage/src/github.com/leanote/leanote`下。
+下载完成后，`Leanote`的源码在`$GOPATH/src/github.com/coocn-cn/leanote`下。
 
 ## 3. 安装`Mongodb`
 
@@ -154,12 +144,12 @@ $> mongo
 -------------------------------------
 ## 4. 导入初始数据
 
-`leanote` 初始数据在`/home/user1/gopackage/src/github.com/leanote/leanote/mongodb_backup/leanote_install_data`中。
+`leanote` 初始数据在`$GOPATH/src/github.com/coocn-cn/leanote/mongodb_backup/leanote_install_data`中。
 
 打开终端， 输入以下命令导入数据。
 
 ```
-$> mongorestore -h localhost -d leanote --dir /home/user1/gopackage/src/github.com/leanote/leanote/mongodb_backup/leanote_install_data
+$> mongorestore -h localhost -d leanote --dir $GOPATH/src/github.com/coocn-cn/leanote/mongodb_backup/leanote_install_data
 ```
 
 现在在`mongodb`中已经新建了`leanote`数据库, 可用命令查看下`Leanote`有多少张"表":
@@ -191,27 +181,47 @@ user2 username: demo@leanote.com, password: demo@leanote.com (仅供体验使用
 
 请务必修改`app.secret`一项, 在若干个随机位置处，将字符修改成一个其他的值, 否则会有安全隐患!
 
-其它的配置可暂时保持不变, 若需要配置数据库信息, 请参照 [Leanote问题汇总](https://github.com/leanote/leanote/wiki/QA)。
+其它的配置可暂时保持不变, 若需要配置数据库信息, 请参照 [Leanote问题汇总](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md)。
 
 
 ---------------------------------
-## 6. 运行`Leanote`
+## 6. 编译`Leanote`
+
+**注意:** 如果机器配置较差，那么编译可能需要较长时间。
+
+新开一个窗口, 进入到目录`$GOPATH/src/github.com/coocn-cn/leanote`，运行:
+```
+$> ./assets/build/build.sh
+```
+
+命令执行成功输出`OK`后，编译出来的文件放在 `$GOPATH/src/github.com/coocn-cn/leanote/output/leanote` 目录下
+
+
+---------------------------------
+## 7. 运行`Leanote`
 
 **注意:** 在此之前请确保`Mongodb`已在运行!
 
-新开一个窗口, 运行:
+在编译的窗口继续运行:
 ```
-$> revel run github.com/leanote/leanote
+$> ./output/leanote/bin/run.sh
 ```
 
-恭喜你, 打开浏览器输入: `http://localhost:9000` 体验Leanote吧!
+等待程序输出 `Listening on.. 0.0.0.0:9000`
+```
+$> ./output/leanote/bin/run.sh
+...
+Listening on.. 0.0.0.0:9000
+```
+
+现在恭喜你, 打开浏览器输入: `http://localhost:9000` 体验Leanote吧!
 
 
 -----------------------------------
 
 # 注意!!!!!!!!!!!!!!
-按照本教程启动`Mongodb`是没有权限控制的, 如果你的Leanote服务器暴露在外网, 任何人都可以访问你的Mongodb并修改, 所以这是极其危险的!!!!!!!!!!! 请务必为Mongodb添加用户名和密码并以`auth`启动, 方法请见: [为mongodb数据库添加用户](https://github.com/leanote/leanote/wiki/QA#%E5%A6%82%E4%BD%95%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D)
+按照本教程启动`Mongodb`是没有权限控制的, 如果你的Leanote服务器暴露在外网, 任何人都可以访问你的Mongodb并修改, 所以这是极其危险的!!!!!!!!!!! 请务必为Mongodb添加用户名和密码并以`auth`启动, 方法请见: [为mongodb数据库添加用户](https://github.com/coocn-cn/leanote/wiki/QA#%E5%A6%82%E4%BD%95%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D)
 
 # `leanote` 安装/配置问题汇总
 
-如果运行有问题或想要进一步配置`Leanote`, 请参照 [Leanote问题汇总](https://github.com/leanote/leanote/wiki/QA)。
+如果运行有问题或想要进一步配置`Leanote`, 请参照 [Leanote问题汇总](https://github.com/coocn-cn/leanote/wiki/QA)。
