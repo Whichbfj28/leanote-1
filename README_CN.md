@@ -6,6 +6,8 @@
 
 Leanote, 不只是笔记!
 
+如果想试用我们的产品，欢迎在 [https://note.coocn.cn](https://note.coocn.cn) 上注册, Leanote团队为你提供稳定可靠的服务。
+
 **特性**
 
 * 高效笔记：Leanote 有易操作的界面, 包含一款富文本编辑器和Markdown编辑器，让您的笔记记录更轻松和高效。对高阶用户，我们还提供`Vim` 和`Emacs` 编辑模式，助推你的写作速度更上层楼。
@@ -32,11 +34,11 @@ Leanote, 不只是笔记!
 * 一套完整的、全平台覆盖的软件套装，包括了web、桌面、安卓、IOS设备，而且全部开源！
 * 还有...
 
-## 3. 获取Leanote
+## 3. 获取 Leanote
 
 Leanote云笔记产品包括: Leanote Web & Server(即本仓库), 桌面客户端, IOS, android. 4端全部开源! 
 
-如果想试用我们的产品，欢迎在 https://leanote.com 上注册, Leanote团队为你提供稳定可靠的服务。
+如果想试用我们的产品，欢迎在 https://note.coocn.cn 上注册, Leanote团队为你提供稳定可靠的服务。
 担心服务厂商如何处理你的个人数据吗？你可以下载Leanote安装在自己的服务器上, 通过Leanote客户端连接与自建服务同步数据。
 
 这里详细整理了Leanote二进版和Leanote开发版的安装教程, 请移步至:
@@ -82,7 +84,7 @@ Leanote还有很多问题, 如果你喜欢它, 欢迎加入我们一起完善Lea
 欢迎加入我们!
 
 ## 联系&加入我们
-* Email: leanote@leanote.com
+* Email: leanote@coocn.cn
 * [Leanote 社区](http://bbs.leanote.com)
 * [QQ群](http://leanote.leanote.com/post/Leanote-groups)
 * [Leanote Google Group](https://groups.google.com/forum/#!forum/leanote)

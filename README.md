@@ -93,7 +93,7 @@ You are welcome to join us.
 
 ## 10. Contacts
 
-* Email: leanote@leanote.com
+* Email: leanote@coocn.cn
 * [Leanote BBS](http://bbs.leanote.com)
 * [Leanote Google Group](https://groups.google.com/forum/#!forum/leanote)
 * QQ Groups: 326073529, 256076853, 158716820
