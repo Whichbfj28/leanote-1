@@ -42,15 +42,11 @@ Leanote云笔记产品包括: Leanote Web & Server(即本仓库), 桌面客户�
 这里详细整理了Leanote二进版和Leanote开发版的安装教程, 请移步至:
 
 * Leanote二进制详细安装教程:
-    * Mac, linux 用户
-        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
-    * Windows 用户
-        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
+    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
+    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
 * Leanote源码详细安装教程:
-    * Mac, linux 用户
-        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
-    * Windows 用户
-        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
+    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
+    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
 
 ## 4. 相关文档
 
@@ -58,7 +54,7 @@ Leanote云笔记产品包括: Leanote Web & Server(即本仓库), 桌面客户�
 
 ## 5. 如何对Leanote进行二次开发
 
-如果您有兴趣基于Leanote二次开发，请查看 [How-to-develop-Leanote](https://github.com/leanote/leanote/wiki/How-to-develop-leanote-%E5%A6%82%E4%BD%95%E5%BC%80%E5%8F%91leanote)。
+如果您有兴趣基于Leanote二次开发，请查看 [How-to-develop-Leanote](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/how-to-develop-leanote.md)。
 
 ## 6. 贡献者
 

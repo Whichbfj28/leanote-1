@@ -10,23 +10,18 @@
 ------------
 * 二进制版详细安装教程
 
-    * Mac, linux 用户
-        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
-    * Windows 用户
-        - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
+    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
+    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
         
 -----------
 * 源码版详细安装教程
 
-    * Mac, linux 用户
-        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
-    * Windows 用户
-        * [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
+    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
+    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
 
 -------
 
-* 使用/安装 `Leanote` 常见问题汇总
-    - [中文](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md)
+* [使用/安装 `Leanote` 常见问题汇总](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md)
 * [如何升级 `Leanote`] (https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/how-to-upgrade-leanote.md)
 
 -------

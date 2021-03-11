@@ -47,20 +47,20 @@ Feeling suspicious about how those note-taking companies treat your personal dat
 More information about how to install Leanote please see:
 
 * Leanote binary installation tutorial:
-    * [Windows](https://github.com/leanote/leanote/wiki/leanote-source-installation-on-Windows-(En))
-    * [Mac and Linux](https://github.com/leanote/leanote/wiki/leanote-binary-installation-on-Mac-and-Linux-(En))
+    * [Mac and Linux](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-binary-installation-on-mac-and-linux.md)
+    * [Windows](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-binary-installation-on-windows.md)
 * Leanote source installation tutorial:
-    * [Windows](https://github.com/leanote/leanote/wiki/leanote-source-installation-on-Windows-(En))
-    * [Mac and Linux](https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En))
+    * [Mac and Linux](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/Leanote-source-installation-on-mac-and-linux.md)
+    * [Windows](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-source-installation-on-windows.md)
 
 ## 4. Documentation
 
-Please see [docs](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn) for detailed instruction on how to install Leanote on various platforms, trouble shooting and configuration explanations.
+Please see [docs](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en) for detailed instruction on how to install Leanote on various platforms, trouble shooting and configuration explanations.
 
 
 ## 5. How to develop Leanote
 
-If you are a developer yourself and feel like to build on top of Leanote, please refer to [How-to-develop-leanote](https://github.com/leanote/leanote/wiki/How-to-develop-leanote-%E5%A6%82%E4%BD%95%E5%BC%80%E5%8F%91leanote).
+If you are a developer yourself and feel like to build on top of Leanote, please refer to [How-to-develop-leanote](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/how-to-develop-leanote.md).
 
 
 ## 6. Contributions

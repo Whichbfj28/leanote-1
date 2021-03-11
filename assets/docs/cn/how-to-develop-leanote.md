@@ -1,6 +1,7 @@
 ## 安装Leanote
 
-参考 [Leanote开发版安装教程](https://github.com/leanote/leanote/wiki/leanote%E5%BC%80%E5%8F%91%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)
+* [`Leanote` 源码导读](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/how-to-read-leanote-source.md)
+* [Leanote开发版安装教程](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote开发版在Cubieboard上详细安装教程.md)
 
 ## 运行Leanote
 以开发模式运行Leanote:
