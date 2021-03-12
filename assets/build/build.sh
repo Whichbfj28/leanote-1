@@ -40,16 +40,16 @@ else
 fi
 
 function generate() {
-	GOPATH=`realpath $(mktemp -d /tmp/go.XXX)`
-	SRCPATH=${GOPATH}/src/${1}
+	GOSRCPATH=$(realpath "${GOPATH}/src/${1}")
+	BUILDSRCPATH=$(realpath "${SCRIPTPATH}/../../")
 
-	mkdir -p ${SRCPATH}
-	rm -r ${SRCPATH}
-	ln -s ${SCRIPTPATH}/../../ ${SRCPATH}
+	if [[ "${BUILDSRCPATH}" != "${GOSRCPATH}" ]]; then
+		mkdir -p ${GOSRCPATH} && rm -r ${GOSRCPATH}
+		ln -s ${BUILDSRCPATH} ${GOSRCPATH}
+	fi
 
 	go mod vendor
 	GO111MODULE=off go run ${SRCPATH}/assets/build/scripts/generate.go
-	rm -rf ${GOPATH}
 }
 
 generate "github.com/coocn-cn/leanote"
