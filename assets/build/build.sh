@@ -49,7 +49,7 @@ function generate() {
 	fi
 
 	go mod vendor
-	GO111MODULE=off go run ${SRCPATH}/assets/build/scripts/generate.go
+	GO111MODULE=off go run ${GOSRCPATH}/assets/build/scripts/generate.go
 }
 
 generate "github.com/coocn-cn/leanote"
