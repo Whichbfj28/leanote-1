@@ -39,8 +39,20 @@ else
 	cp ${SCRIPTPATH}/scripts/run.bat $OUTPUTPATH/bin/
 fi
 
-go mod vendor
-GO111MODULE=off go run ${SCRIPTPATH}/scripts/generate.go
+function generate() {
+	GOPATH=`realpath $(mktemp -d /tmp/go.XXX)`
+	SRCPATH=${GOPATH}/src/${1}
+
+	mkdir -p ${SRCPATH}
+	rm -r ${SRCPATH}
+	ln -s ${SCRIPTPATH}/../../ ${SRCPATH}
+
+	go mod vendor
+	GO111MODULE=off go run ${SRCPATH}/assets/build/scripts/generate.go
+	rm -rf ${GOPATH}
+}
+
+generate "github.com/coocn-cn/leanote"
 GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${SCRIPTPATH}/../../app/tmp
 
 ##==================
@@ -50,7 +62,15 @@ GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${S
 cd "$SCRIPTPATH"
 
 # bin
-cp -r ./src $OUTPUTPATH/bin/
+cp -r ./assets/src $OUTPUTPATH/bin
+
+# others
+cp -r ./assets/public $OUTPUTPATH
+cp -r ./assets/messages $OUTPUTPATH
+cp -r ./assets/mongodb_backup $OUTPUTPATH
+
+# views
+cp -r ../../app/views $OUTPUTPATH/app
 
 # conf
 cp ../../conf/routes $OUTPUTPATH/conf/
@@ -58,14 +78,6 @@ cp ../../conf/app.conf $OUTPUTPATH/conf/
 
 # 处理app.conf, 还原配置
 sed -i 's/db.dbname=leanote.*#/db.dbname=leanote #/' $OUTPUTPATH/conf/app.conf
-
-# views
-cp -r ../../app/views $OUTPUTPATH/app
-
-# others
-cp -r ../../public $OUTPUTPATH
-cp -r ../../messages $OUTPUTPATH
-cp -r ../../mongodb_backup $OUTPUTPATH
 
 cd - >/dev/null
 
