@@ -40,6 +40,10 @@ else
 fi
 
 function generate() {
+	if [[ ! -e "${GOPATH}/src/${1}" ]]; then
+		mkdir -p "${GOPATH}/src/${1}"
+	fi
+
 	GOSRCPATH=$(realpath "${GOPATH}/src/${1}")
 	BUILDSRCPATH=$(realpath "${SCRIPTPATH}/../../")
 
