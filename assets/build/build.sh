@@ -45,23 +45,25 @@ function generate() {
 		GOPATH="/tmp/gopath"
 	fi
 
-	if [[ ! -e "${GOPATH}/src/${1}" ]]; then
-		mkdir -p "${GOPATH}/src/${1}"
+	GOSRCPATH="${GOPATH}/src/${1}"
+	if [[ ! -e "${GOSRCPATH}" ]]; then
+		mkdir -p "${GOSRCPATH}"
 	fi
 
-	GOSRCPATH=$(realpath "${GOPATH}/src/${1}")
 	BUILDSRCPATH=$(realpath "${SCRIPTPATH}/../../")
-
 	if [[ "${BUILDSRCPATH}" != "${GOSRCPATH}" ]]; then
-		mkdir -p ${GOSRCPATH} && rm -r ${GOSRCPATH}
+		rm -rf ${GOSRCPATH}
 		ln -s ${BUILDSRCPATH} ${GOSRCPATH}
 	fi
 
 	go mod vendor
-	GO111MODULE=off go run ${GOSRCPATH}/assets/build/scripts/generate.go
+	GOPATH=${GOPATH} GO111MODULE=off go run ${GOSRCPATH}/assets/build/scripts/generate.go
 }
 
-generate "github.com/coocn-cn/leanote"
+if [[ ! -e "${SCRIPTPATH}/../../app/tmp" ]]; then 
+	generate "github.com/coocn-cn/leanote"
+fi
+
 GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${SCRIPTPATH}/../../app/tmp
 
 ##==================

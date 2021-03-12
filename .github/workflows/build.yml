@@ -3,7 +3,7 @@ on:
     branches:
     - master
     - release/*
-name: build-release
+name: build
 jobs:
   release-drafter:
     if: ${{ github.ref == 'refs/heads/master' }}
