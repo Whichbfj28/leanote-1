@@ -40,6 +40,10 @@ else
 fi
 
 function generate() {
+	if [[ -z "${GOPATH}" ]]; then
+		GOPATH="/tmp/gopath"
+	fi
+
 	if [[ ! -e "${GOPATH}/src/${1}" ]]; then
 		mkdir -p "${GOPATH}/src/${1}"
 	fi
