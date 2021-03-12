@@ -2,12 +2,12 @@
 
 # release leanote
 
-# version
-VERSION=${1:-"v2.6.1"}
+# name
+NAME=${1:-"release"}
 # output path to store leanote output files
 OUTPUTPATH=${3:-"./output/leanote"}
 # release path to store leanote release files
-RELEASEPATH=${3:-"./output/release"}
+RELEASEPATH=${3:-"./output"}
 
 # 当前路径
 SCRIPTPATH=$(cd "$(dirname "$0")"; pwd)
@@ -22,9 +22,9 @@ mkdir -p $OUTPUTPATH
 
 OUTPUTPATH=$(realpath ${OUTPUTPATH})
 
-# 创建一个$VERSION的目录存放之
-rm -rf $RELEASEPATH/$VERSION
-mkdir -p $RELEASEPATH/$VERSION
+# 创建一个$NAME的目录存放之
+rm -rf $RELEASEPATH/$NAME
+mkdir -p $RELEASEPATH/$NAME
 
 RELEASEPATH=$(realpath ${RELEASEPATH})
 
@@ -48,7 +48,7 @@ function tarRelease()
 		cp $SCRIPTPATH/scripts/run.bat $OUTPUTPATH/bin/
 	fi
 	
-	tar -czf $RELEASEPATH/$VERSION/leanote-$1-$2-$VERSION.bin.tar.gz -C "$OUTPUTPATH" .
+	tar -czf $RELEASEPATH/$NAME/leanote-$1-$2-$NAME.bin.tar.gz -C "$OUTPUTPATH" .
 }
 
 tarRelease "darwin" "amd64";

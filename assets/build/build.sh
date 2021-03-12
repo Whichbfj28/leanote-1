@@ -40,7 +40,7 @@ else
 fi
 
 go mod vendor
-GO111MODULE=off go run ${SCRIPTPATH}/scripts/generate.go 2>"build.log"
+GO111MODULE=off go run ${SCRIPTPATH}/scripts/generate.go
 GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${SCRIPTPATH}/../../app/tmp
 
 ##==================
