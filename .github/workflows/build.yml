@@ -28,21 +28,3 @@ jobs:
         with:
             name: build-pkg
             path: ./output/leanote
-  release:
-    if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-      - name: Check out code
-        uses: actions/checkout@v1
-      - name: Build
-        run: make release 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            ./output/release/*
