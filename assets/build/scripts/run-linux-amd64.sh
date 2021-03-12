@@ -15,4 +15,4 @@ export GOPATH=$SCRIPTPATH
 
 script="$SCRIPTPATH/leanote-linux-amd64"
 chmod 777 $script
-$script -importPath github.com/coocn-cn/leanote
+GO111MODULE=off $script -importPath github.com/coocn-cn/leanote

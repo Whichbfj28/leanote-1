@@ -19,4 +19,5 @@ files
 .idea
 *.iml
 *.log
-/output
+/output/
+/vendor/

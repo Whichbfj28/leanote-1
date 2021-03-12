@@ -39,7 +39,8 @@ else
 	cp ${SCRIPTPATH}/scripts/run.bat $OUTPUTPATH/bin/
 fi
 
-go run ${SCRIPTPATH}/../../app/cmd 2>"build.log"
+go mod vendor
+GO111MODULE=off go run ${SCRIPTPATH}/scripts/generate.go 2>"build.log"
 GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${SCRIPTPATH}/../../app/tmp
 
 ##==================
