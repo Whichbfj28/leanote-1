@@ -2,11 +2,6 @@
 
 If you wish to experience the new feature sooner or help develop `Leanote`, please try using the source distribution. 
 
-- For **source** installation on Mac and Linux, see [here](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-binary-installation-on-mac-and-linux.md).
-- For **binary** installation on Windows, see [here](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-binary-installation-on-windows.md).
-- For **source** installation on Mac and Linux, see [here](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/Leanote-source-installation-on-mac-and-linux.md).
-- For **source** installation on Windows, see [here](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-source-installation-on-windows.md).
-
 ----------------
 # Installation Overview:
 
@@ -19,7 +14,7 @@ If you wish to experience the new feature sooner or help develop `Leanote`, plea
 ----------------------
 ## 1. Download the binary file of `Leanote`
 
-Choose and download the binary file corresponding to your system from [here](http://leanote.org/#download).
+Choose and download the binary file corresponding to your system from [here](https://github.com/coocn-cn/leanote/releases/latest).
 
 Suppose it is saved in the `/home/user1` folder, extract the `.zip` file there using:
 ```

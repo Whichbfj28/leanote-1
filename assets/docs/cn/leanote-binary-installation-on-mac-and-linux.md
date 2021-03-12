@@ -1,9 +1,5 @@
 ## 本教程适合 Mac 及 linux 用户的**二进制版**安装。
 
-- Mac, Linux 用户的源码版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Mac-and-Linux)。
-- Windows 用户的二进制版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)。
-- Windows 用户的源码版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)。
-
 ----------------------------------
 # 安装步骤:
 
@@ -17,7 +13,7 @@
 ----------------------------
 ## 1. 下载 `leanote` 二进制版
 
-由此处下载 [leanote 最新二进制版](http://leanote.org/#download)。
+由此处下载 [leanote 最新二进制版](https://github.com/coocn-cn/leanote/releases/latest)。
 
 假设将文件下载到 `/home/user1` 目录下, 解压文件从而在 `/home/user1` 目录下生成 `leanote`目录：
 ```

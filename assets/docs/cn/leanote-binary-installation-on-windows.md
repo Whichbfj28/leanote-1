@@ -1,9 +1,5 @@
 ## 本教程适合 Windows 用户的**二进制版**安装。
 
-- Windows 用户的源码版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Windows)。
-- Mac, Linux 用户的二进制版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Mac-and-Linux)。
-- Mac, Linux 用户的源码版安装，参见[这里](https://github.com/leanote/leanote/wiki/Leanote-%E6%BA%90%E7%A0%81%E7%89%88%E8%AF%A6%E7%BB%86%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B----Mac-and-Linux)。
-
 ----------------------
 # 安装步骤:
 
@@ -17,7 +13,7 @@
 -------------------------------
 ## 1. 下载 `leanote` 二进制版
 
-下载 [leanote 最新二进制版](http://leanote.org/#download), 请根据系统选择相应文件。
+下载 [leanote 最新二进制版](https://github.com/coocn-cn/leanote/releases/latest), 请根据系统选择相应文件。
 
 假设将文件下载到 `C:\user1` 下并解压, 现在应该有 `C:\users1\leanote`。
 
@@ -109,7 +105,7 @@ user2 username: demo@leanote.com, password: demo@leanote.com (仅供体验使用
 
 请务必修改`app.secret`一项, 在若干个随机位置处，将字符修改成一个其他的值, 否则会有安全隐患!
 
-其它的配置可暂时保持不变, 若需要配置数据库信息, 请参照 [leanote问题汇总](https://github.com/leanote/leanote/wiki/QA)。
+其它的配置可暂时保持不变, 若需要配置数据库信息, 请参照 [leanote问题汇总](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md)。
 
 ---------------------------------
 ## 5. 运行`leanote`
@@ -132,8 +128,8 @@ Listening on :9000...
 恭喜你, 打开浏览器输入: `http://localhost:9000` 体验`leanote`吧!
 
 # 注意!!!!!!!!!!!!!!
-按照本教程启动`Mongodb`是没有权限控制的, 如果你的Leanote服务器暴露在外网, 任何人都可以访问你的Mongodb并修改, 所以这是极其危险的!!!!!!!!!!! 请务必为Mongodb添加用户名和密码并以`auth`启动, 方法请见: [为mongodb数据库添加用户](https://github.com/leanote/leanote/wiki/QA#%E5%A6%82%E4%BD%95%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D)
+按照本教程启动`Mongodb`是没有权限控制的, 如果你的Leanote服务器暴露在外网, 任何人都可以访问你的Mongodb并修改, 所以这是极其危险的!!!!!!!!!!! 请务必为Mongodb添加用户名和密码并以`auth`启动, 方法请见: [为mongodb数据库添加用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md#%E5%A6%82%E4%BD%95%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D)
 
 # `leanote` 安装/配置问题汇总
 
-如果运行有问题或想要进一步配置`leanote`, 请参照 [leanote问题汇总](https://github.com/leanote/leanote/wiki/QA)。
+如果运行有问题或想要进一步配置`leanote`, 请参照 [leanote问题汇总](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-qa.md)。

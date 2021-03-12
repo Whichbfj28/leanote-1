@@ -1,9 +1,5 @@
 **This tutorial explains doing a *binary* installation on Windows systems.**
 
-- For **source** installation on Windows, see [here](https://github.com/leanote/leanote/wiki/leanote-source-installation-on-Windows-(En)).
-- For **binary** installation on Mac and Linux, see [here](https://github.com/leanote/leanote/wiki/leanote-binary-installation-on-Mac-and-Linux-(En)). 
-- For **source** installation on Mac and Linux, see [here](https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En)).
-
 -------
 # Installation overview:
 
@@ -16,7 +12,7 @@
 ---------
 ## 1. Download the binary file of `leanote`
 
-Choose and download the binary file corresponding to your system from [here](http://leanote.org/#download).
+Choose and download the binary file corresponding to your system from [here](https://github.com/coocn-cn/leanote/releases/latest).
 
 Suppose it is saved in `C:\user1`, extract it there to get the installation folder `C:\users1\leanote`.
 
