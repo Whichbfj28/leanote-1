@@ -40,6 +40,7 @@ else
 fi
 
 function generate() {
+	GOPATH=$(go env GOPATH)
 	if [[ -z "${GOPATH}" ]]; then
 		GOPATH="/tmp/gopath"
 	fi
