@@ -3,6 +3,7 @@ package member
 import (
 	"github.com/coocn-cn/leanote/app/info"
 	"github.com/coocn-cn/leanote/app/service"
+
 	//	. "github.com/coocn-cn/leanote/app/lea"
 	"github.com/revel/revel"
 	//	"strings"
@@ -13,7 +14,6 @@ var groupService *service.GroupService
 var noteService *service.NoteService
 var trashService *service.TrashService
 var notebookService *service.NotebookService
-var noteContentHistoryService *service.NoteContentHistoryService
 var authService *service.AuthService
 var shareService *service.ShareService
 var blogService *service.BlogService
@@ -104,7 +104,6 @@ func AuthInterceptor(c *revel.Controller) revel.Result {
 func InitService() {
 	notebookService = service.NotebookS
 	noteService = service.NoteS
-	noteContentHistoryService = service.NoteContentHistoryS
 	trashService = service.TrashS
 	shareService = service.ShareS
 	userService = service.UserS

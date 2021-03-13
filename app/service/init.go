@@ -8,6 +8,7 @@ import (
 
 	"github.com/coocn-cn/leanote/app/db"
 	. "github.com/coocn-cn/leanote/app/lea"
+	"github.com/coocn-cn/leanote/app/note/repository/mongo"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -18,7 +19,6 @@ import (
 
 var notebookService, NotebookS *NotebookService
 var noteService, NoteS *NoteService
-var noteContentHistoryService, NoteContentHistoryS *NoteContentHistoryService
 var trashService, TrashS *TrashService
 var shareService, ShareS *ShareService
 var userService, UserS *UserService
@@ -41,9 +41,8 @@ var ThemeS, themeService *ThemeService
 
 // onAppStart调用
 func InitService() {
-	NotebookS = &NotebookService{}
+	NotebookS = &NotebookService{book: mongo.NewBook(nil), note: mongo.NewNote(nil), content: mongo.NewContent(nil)}
 	NoteS = &NoteService{}
-	NoteContentHistoryS = &NoteContentHistoryService{}
 	TrashS = &TrashService{}
 	ShareS = &ShareService{}
 	UserS = &UserService{}
@@ -66,7 +65,6 @@ func InitService() {
 
 	notebookService = NotebookS
 	noteService = NoteS
-	noteContentHistoryService = NoteContentHistoryS
 	trashService = TrashS
 	shareService = ShareS
 	userService = UserS
