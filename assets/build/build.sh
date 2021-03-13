@@ -51,18 +51,19 @@ function generate() {
 	fi
 
 	BUILDSRCPATH=$(realpath "${SCRIPTPATH}/../../")
-	if [[ "${BUILDSRCPATH}" != "${GOSRCPATH}" ]]; then
-		rm -rf ${GOSRCPATH}
-		ln -s ${BUILDSRCPATH} ${GOSRCPATH}
+	if [[ "$(realpath ${BUILDSRCPATH})" != "$(realpath ${GOSRCPATH})" ]]; then
+		# rm -rf ${GOSRCPATH}
+		# ln -s ${BUILDSRCPATH} ${GOSRCPATH}
+		echo  "${BUILDSRCPATH}" != "${GOSRCPATH}"
 	fi
 
 	go mod vendor
 	GOPATH=${GOPATH} GO111MODULE=off go run ${GOSRCPATH}/assets/build/scripts/generate.go
 }
 
-if [[ ! -e "${SCRIPTPATH}/../../app/tmp" ]]; then 
+# if [[ ! -e "${SCRIPTPATH}/../../app/tmp" ]]; then 
 	generate "github.com/coocn-cn/leanote"
-fi
+# fi
 
 GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUTPATH/bin/leanote-$OS-$ARCH$suffix" ${SCRIPTPATH}/../../app/tmp
 

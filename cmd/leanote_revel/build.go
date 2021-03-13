@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/coocn-cn/leanote/cmd/harness"
-	_ "github.com/revel/modules/static"
 	"github.com/revel/revel"
 )
 

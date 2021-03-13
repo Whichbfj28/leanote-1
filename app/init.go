@@ -3,6 +3,14 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"math"
+	"net/url"
+	"reflect"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/coocn-cn/leanote/app/controllers"
 	"github.com/coocn-cn/leanote/app/controllers/admin"
 	"github.com/coocn-cn/leanote/app/controllers/api"
@@ -14,13 +22,9 @@ import (
 	"github.com/coocn-cn/leanote/app/lea/route"
 	"github.com/coocn-cn/leanote/app/service"
 	"github.com/revel/revel"
-	"html/template"
-	"math"
-	"net/url"
-	"reflect"
-	"strconv"
-	"strings"
-	"time"
+
+	_ "github.com/revel/modules/static"
+	_ "github.com/revel/modules/static/app/controllers"
 )
 
 func init() {
