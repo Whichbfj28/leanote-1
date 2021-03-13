@@ -1,6 +1,8 @@
 package model
 
 import (
+	"context"
+
 	"github.com/coocn-cn/leanote/app/info"
 )
 
@@ -9,35 +11,36 @@ const maxSize = 10
 type HistoryData info.NoteContentHistory
 
 type HistoryMutation interface {
-	Data() HistoryData
-	SetHistories([]info.EachHistory)
+	Data(context.Context) (HistoryData, error)
+	SetField(name string, value interface{})
+	SetFields(fields map[string]interface{})
 }
 
 type History struct {
-	old      HistoryData
-	mutation HistoryMutation
+	HistoryMutation
 }
 
 func NewHistory(mut HistoryMutation) *History {
-	return &History{
-		old:      mut.Data(),
-		mutation: mut,
+	return &History{HistoryMutation: mut}
+}
+
+func (m *History) MustData(ctx context.Context) HistoryData {
+	data, err := m.Data(ctx)
+	if err != nil {
+		panic(err)
 	}
+
+	return data
 }
 
-func (m *History) M() HistoryMutation {
-	return m.mutation
-}
-
-func (m *History) Data() HistoryData {
-	return m.M().Data()
-}
-
-func (m *History) AddHistory(history info.EachHistory) {
-	// 判断是否超出 maxSize, 如果超出则pop最后一个, 再push之, 不用那么麻烦, 直接update吧, 虽然影响性能
-
-	mut := m.M()
-	old := m.Data().Histories
+// 判断是否超出 maxSize, 如果超出则pop最后一个, 再push之, 不用那么麻烦, 直接update吧, 虽然影响性能
+func (m *History) AddHistory(ctx context.Context, history info.EachHistory) error {
+	mut := m
+	data, err := m.Data(ctx)
+	if err != nil {
+		return err
+	}
+	old := data.Histories
 
 	histories := make([]info.EachHistory, 0, len(old)+1)
 	histories = append(histories, history) // 在开头加了, 最近的在最前
@@ -47,5 +50,7 @@ func (m *History) AddHistory(history info.EachHistory) {
 		histories = histories[:maxSize]
 	}
 
-	mut.SetHistories(histories)
+	mut.SetField("Histories", histories)
+
+	return nil
 }

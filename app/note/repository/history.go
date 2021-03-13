@@ -6,36 +6,35 @@ import (
 	"github.com/coocn-cn/leanote/app/note/model"
 )
 
-//go:generate gex implgen -destination git/$GOFILE -package git -impl_names HistoryRepository=history -source $GOFILE
-//go:generate gex implgen -destination mongo/$GOFILE -package mongo -impl_names HistoryRepository=history -source $GOFILE
+//xgo:generate gex implgen -destination git/$GOFILE -package git -impl_names HistoryRepository=content -source $GOFILE
+//go:generate gex implgen -destination mongo/$GOFILE -package mongo -impl_names HistoryRepository=content -source $GOFILE
 //go:generate gex mockgen -destination mock/$GOFILE -package mock -source $GOFILE
 
 type HistoryRepository interface {
 	// New is 初始化一个新的领域对象
 	New(ctx context.Context, data model.HistoryData) *model.History
 
-	// Load is 从仓储加载一个领域对象
-	Load(ctx context.Context, id uint64) (*model.History, error)
 	// Find is 加载一个符合 Predicater 条件的领域对象
-	Find(ctx context.Context, predicates Predicater) (*model.History, error)
+	Find(ctx context.Context, predicate Predicater) (*model.History, error)
+	// Count is 获取所有符合 Predicater 条件的领域对象的个数
+	Count(ctx context.Context, predicate Predicater) (int, error)
 	// FindAll is 加载所有符合 Predicater 条件的领域对象
-	FindAll(ctx context.Context, predicates Predicater) ([]*model.History, error)
+	FindAll(ctx context.Context, predicate Predicater) ([]*model.History, error)
 
 	// Save is 保存领域对象到仓储
-	Save(ctx context.Context, model *model.History) error
+	Save(ctx context.Context, models ...*model.History) error
 
 	// Delete is 删除仓储中的领域对象
-	Delete(ctx context.Context, model *model.History) error
+	Delete(ctx context.Context, models ...*model.History) error
 	// DeleteID is 通过ID删除仓储中的领域对象
-	DeleteID(ctx context.Context, id uint64) error
+	DeleteID(ctx context.Context, ids ...uint64) error
 }
 
-// HistoryUserAndID is 查询条件 - 按用户和ID过滤
-func HistoryUserAndID(userID string, id string) Predicater {
+// HistoryNoteID is 查询条件 - 获取记事的历史纪录
+func HistoryNoteID(noteID string) Predicater {
 	data := map[string]string{
-		"userID": userID,
-		"id":     id,
+		"noteID": noteID,
 	}
 
-	return &basePredicate{name: "HistoryUserAndID", data: data}
+	return &basePredicate{name: "historyNoteID", data: data}
 }

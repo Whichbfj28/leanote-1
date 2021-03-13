@@ -16,6 +16,8 @@ func Mask(c int32, defaultMsg string) func(ctx context.Context, msg string, fiel
 	}
 }
 
-func MaskStandard(c int32) func(ctx context.Context, msg string, fields ...interface{}) CodeError {
-	return Mask(c, codes.Code(c).String())
+func MaskStandard(c int32) func(ctx context.Context, fields ...interface{}) CodeError {
+	return func(ctx context.Context, fields ...interface{}) CodeError {
+		return Error(ctx, c, codes.Code(c).String(), fields...)
+	}
 }

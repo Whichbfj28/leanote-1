@@ -59,6 +59,7 @@ function generate() {
 
 	go mod vendor
 	GOPATH=${GOPATH} GO111MODULE=off go run ${GOSRCPATH}/assets/build/scripts/generate.go
+	rm -rf ${GOSRCPATH}/vendor
 }
 
 # if [[ ! -e "${SCRIPTPATH}/../../app/tmp" ]]; then 
