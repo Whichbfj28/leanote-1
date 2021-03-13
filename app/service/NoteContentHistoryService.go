@@ -1,8 +1,12 @@
 package service
 
 import (
-	"github.com/coocn-cn/leanote/app/db"
+	"context"
+
 	"github.com/coocn-cn/leanote/app/info"
+	"github.com/coocn-cn/leanote/app/note/model"
+	"github.com/coocn-cn/leanote/app/note/repository"
+	"github.com/coocn-cn/leanote/pkg/log"
 
 	//	. "github.com/coocn-cn/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
@@ -11,56 +15,53 @@ import (
 
 // 历史记录
 type NoteContentHistoryService struct {
+	repo repository.HistoryRepository
 }
-
-// 每个历史记录最大值
-var maxSize = 10
 
 // 新建一个note, 不需要添加历史记录
 // 添加历史
-func (this *NoteContentHistoryService) AddHistory(noteId, userId string, eachHistory info.EachHistory) {
+func (m *NoteContentHistoryService) AddHistory(noteId, userId string, eachHistory info.EachHistory) {
+	ctx := context.Background()
 	// 检查是否是空
 	if eachHistory.Content == "" {
 		return
 	}
 
 	// 先查是否存在历史记录, 没有则添加之
-	history := info.NoteContentHistory{}
-	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &history)
-	if history.NoteId == "" {
-		this.newHistory(noteId, userId, eachHistory)
-	} else {
-		// 判断是否超出 maxSize, 如果超出则pop最后一个, 再push之, 不用那么麻烦, 直接update吧, 虽然影响性能
-		// TODO
-		l := len(history.Histories)
-		if l >= maxSize {
-			// history.Histories = history.Histories[l-maxSize:] // BUG, 致使都是以前的
-			history.Histories = history.Histories[:maxSize]
-		}
-		newHistory := []info.EachHistory{eachHistory}
-		newHistory = append(newHistory, history.Histories...) // 在开头加了, 最近的在最前
-		history.Histories = newHistory
-
-		// 更新之
-		db.UpdateByIdAndUserId(db.NoteContentHistories, noteId, userId, history)
-	}
-	return
-}
-
-// 新建历史
-func (this *NoteContentHistoryService) newHistory(noteId, userId string, eachHistory info.EachHistory) {
-	history := info.NoteContentHistory{NoteId: bson.ObjectIdHex(noteId),
-		UserId:    bson.ObjectIdHex(userId),
-		Histories: []info.EachHistory{eachHistory},
+	history, err := m.repo.Find(ctx, repository.HistoryUserAndID(userId, noteId))
+	if err != nil {
+		log.G(ctx).WithError(err).Error("获取笔记历史列表失败")
+		return
 	}
 
-	// 保存之
-	db.Insert(db.NoteContentHistories, history)
+	if history == nil {
+		history = m.repo.New(ctx, model.HistoryData{
+			UserId: bson.ObjectIdHex(userId),
+			NoteId: bson.ObjectIdHex(noteId),
+		})
+	}
+
+	history.AddHistory(eachHistory)
+
+	err = m.repo.Save(ctx, history)
+	if nil != err {
+		log.G(ctx).WithError(err).Error("保存笔记历史失败")
+	}
 }
 
 // 列表展示
-func (this *NoteContentHistoryService) ListHistories(noteId, userId string) []info.EachHistory {
-	histories := info.NoteContentHistory{}
-	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &histories)
-	return histories.Histories
+func (m *NoteContentHistoryService) ListHistories(noteId, userId string) []info.EachHistory {
+	ctx := context.Background()
+
+	history, err := m.repo.Find(ctx, repository.HistoryUserAndID(userId, noteId))
+	if err != nil {
+		log.G(ctx).WithError(err).Error("获取笔记历史列表失败")
+		return []info.EachHistory{}
+	}
+
+	if history == nil {
+		return []info.EachHistory{}
+	}
+
+	return history.Data().Histories
 }

@@ -1,5 +1,4 @@
 /src
-pkg
 bin2
 bin/i18n
 bin/leanote*
@@ -19,5 +18,6 @@ files
 .idea
 *.iml
 *.log
+/bin
 /output/
 /vendor/
