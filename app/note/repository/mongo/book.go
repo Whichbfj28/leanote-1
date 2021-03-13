@@ -70,8 +70,8 @@ func (m *book) FindAll(ctx context.Context, predicate repository.Predicater) ([]
 	}
 
 	resp := make([]*model.Book, 0, len(books))
-	for _, v := range books {
-		dbData := newbookData(model.BookData(v), &v, m)
+	for i := range books {
+		dbData := newbookData(model.BookData(books[i]), &books[i], m)
 		resp = append(resp, model.NewBook(dbData))
 	}
 
@@ -133,6 +133,9 @@ func (m *book) DeleteID(ctx context.Context, ids ...string) error {
 
 func (m *book) predicates(ctx context.Context, predicate repository.Predicater) bson.M {
 	switch predicate.Predicate() {
+	case "BookID":
+		params := predicate.Data().(map[string]string)
+		return bson.M{"_id": bson.ObjectIdHex(params["id"])}
 	case "BookIDs":
 		params := predicate.Data().(map[string][]string)
 

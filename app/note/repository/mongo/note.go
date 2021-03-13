@@ -60,8 +60,8 @@ func (m *note) FindAll(ctx context.Context, predicate repository.Predicater) ([]
 	m.collection.Find(m.predicates(ctx, predicate)).All(&notes)
 
 	resp := make([]*model.Note, 0, len(notes))
-	for _, v := range notes {
-		dbData := newnoteData(model.NoteData(v), &v, m)
+	for i := range notes {
+		dbData := newnoteData(model.NoteData(notes[i]), &notes[i], m)
 		resp = append(resp, model.NewNote(dbData))
 	}
 

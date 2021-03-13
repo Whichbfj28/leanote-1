@@ -55,8 +55,8 @@ func (m *history) FindAll(ctx context.Context, predicate repository.Predicater) 
 	m.collection.Find(m.predicates(ctx, predicate)).All(&historys)
 
 	resp := make([]*model.History, 0, len(historys))
-	for _, v := range historys {
-		resp = append(resp, model.NewHistory(newHistoryMutation(model.HistoryData(v), &v)))
+	for i := range historys {
+		resp = append(resp, model.NewHistory(newHistoryMutation(model.HistoryData(historys[i]), &historys[i])))
 	}
 
 	return resp, nil

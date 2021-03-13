@@ -58,8 +58,8 @@ func (m *content) FindAll(ctx context.Context, predicate repository.Predicater) 
 	m.collection.Find(m.predicates(ctx, predicate)).All(&contents)
 
 	resp := make([]*model.Content, 0, len(contents))
-	for _, v := range contents {
-		resp = append(resp, model.NewContent(newContentMutation(model.ContentData(v), &v)))
+	for i := range contents {
+		resp = append(resp, model.NewContent(newContentMutation(model.ContentData(contents[i]), &contents[i])))
 	}
 
 	return resp, nil
