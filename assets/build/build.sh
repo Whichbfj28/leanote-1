@@ -52,8 +52,8 @@ function generate() {
 
 	BUILDSRCPATH=$(realpath "${SCRIPTPATH}/../../")
 	if [[ "$(realpath ${BUILDSRCPATH})" != "$(realpath ${GOSRCPATH})" ]]; then
-		# rm -rf ${GOSRCPATH}
-		# ln -s ${BUILDSRCPATH} ${GOSRCPATH}
+		rm -rf ${GOSRCPATH}
+		ln -s ${BUILDSRCPATH} ${GOSRCPATH}
 		echo  "${BUILDSRCPATH}" != "${GOSRCPATH}"
 	fi
 
