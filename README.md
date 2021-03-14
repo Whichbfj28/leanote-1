@@ -52,6 +52,10 @@ More information about how to install Leanote please see:
 * Leanote source installation tutorial:
     * [Mac and Linux](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/Leanote-source-installation-on-mac-and-linux.md)
     * [Windows](https://github.com/coocn-cn/leanote/blob/master/assets/docs/en/leanote-source-installation-on-windows.md)
+* Leanote Other platform installation package download address：
+    * [PC download link](https://sourceforge.net/projects/leanote-desktop-app/files/2.6/)
+    * [IOS download link](https://apps.apple.com/cn/app/leanote/id1022302858)
+    * [Android download link](https://github.com/leanote/leanote-android/releases/latest)
 
 ## 4. Documentation
 

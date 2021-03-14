@@ -38,17 +38,22 @@ Leanote, 不只是笔记!
 
 Leanote云笔记产品包括: Leanote Web & Server(即本仓库), 桌面客户端, IOS, android. 4端全部开源! 
 
-如果想试用我们的产品，欢迎在 https://note.coocn.cn 上注册, Leanote团队为你提供稳定可靠的服务。
 担心服务厂商如何处理你的个人数据吗？你可以下载Leanote安装在自己的服务器上, 通过Leanote客户端连接与自建服务同步数据。
 
-这里详细整理了Leanote二进版和Leanote开发版的安装教程, 请移步至:
+如果想试用我们的产品，欢迎在  [https://note.coocn.cn](https://note.coocn.cn) 上注册, Leanote团队为你提供稳定可靠的服务。
 
-* Leanote二进制详细安装教程:
-    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
-    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
-* Leanote源码详细安装教程:
+这里详细整理了Leanote二进制版和Leanote开发版的安装教程, 请移步至:
+
+* Leanote 源码详细安装教程:
     * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/Leanote-source-installation-on-mac-and-linux.md)
     * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-source-installation-on-windows.md)
+* Leanote 二进制详细安装教程:
+    * [Mac, linux 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-mac-and-linux.md)
+    * [Windows 用户](https://github.com/coocn-cn/leanote/blob/master/assets/docs/cn/leanote-binary-installation-on-windows.md)
+* Leanote 其他平台安装包下载地址：
+    * [PC 版下载地址](https://sourceforge.net/projects/leanote-desktop-app/files/2.6/)
+    * [IOS 版下载地址](https://apps.apple.com/cn/app/leanote/id1022302858)
+    * [Android 版下载地址](https://github.com/leanote/leanote-android/releases/latest)
 
 ## 4. 相关文档
 
