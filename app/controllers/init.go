@@ -13,7 +13,6 @@ import (
 	"github.com/revel/revel"
 )
 
-var trashService *service.TrashService
 var shareService *service.ShareService
 var blogService *service.BlogService
 var suggestionService *service.SuggestionService
@@ -30,6 +29,7 @@ var sessionService *user_service.SessionService
 var pwdService *user_service.PwdService
 var tokenService *user_service.TokenService
 var noteService *note_service.NoteService
+var trashService *note_service.TrashService
 var notebookService *note_service.NotebookService
 
 var pageSize = 1000

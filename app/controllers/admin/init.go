@@ -11,7 +11,6 @@ import (
 	//	"strings"
 )
 
-var trashService *service.TrashService
 var shareService *service.ShareService
 var blogService *service.BlogService
 var suggestionService *service.SuggestionService
@@ -101,7 +100,6 @@ func AuthInterceptor(c *revel.Controller) revel.Result {
 func InitService() {
 	notebookService = service.NotebookS
 	noteService = service.NoteS
-	trashService = service.TrashS
 	shareService = service.ShareS
 	userService = service.UserS
 	blogService = service.BlogS

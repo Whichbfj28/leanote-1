@@ -20,7 +20,6 @@ import (
 // 初始化, 实例service
 // 为了共享service
 
-var trashService, TrashS *TrashService
 var shareService, ShareS *ShareService
 var blogService, BlogS *BlogService
 var noteImageService, NoteImageS *NoteImageService
@@ -36,6 +35,7 @@ var ThemeS, themeService *ThemeService
 var tagService, TagS *tag_service.TagService
 var notebookService, NotebookS *note_service.NotebookService
 var noteService, NoteS *note_service.NoteService
+var trashService, TrashS *note_service.TrashService
 var PwdS *user_service.PwdService
 var userService, UserS *user_service.UserService
 var groupService, GroupS *user_service.GroupService
@@ -45,7 +45,6 @@ var SessionS, sessionService *user_service.SessionService
 // onAppStart调用
 func InitService() {
 	ctx := context.Background()
-	TrashS = &TrashService{}
 	ShareS = &ShareService{}
 	BlogS = &BlogService{}
 	NoteImageS = &NoteImageService{}
@@ -65,6 +64,7 @@ func InitService() {
 	TagS = tag_service.NewTag(ctx)
 	NotebookS = note_service.NewBook(ctx, UserS, BlogS)
 	NoteS = note_service.NewNote(ctx, UserS, NotebookS, TagS, ShareS, BlogS, NoteImageS, AttachS, ConfigS)
+	TrashS = note_service.NewTrash(ctx, NoteS, NotebookS, UserS, AttachS, ShareS)
 	AuthS = user_service.NewAuth(ctx, UserS, ConfigS, ShareS, EmailS, BlogS, NoteS, NotebookS)
 
 	notebookService = NotebookS

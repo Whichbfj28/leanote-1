@@ -14,7 +14,6 @@ import (
 	"github.com/revel/revel"
 )
 
-var trashService *service.TrashService
 var shareService *service.ShareService
 var blogService *service.BlogService
 var suggestionService *service.SuggestionService
@@ -26,6 +25,7 @@ var configService *service.ConfigService
 var emailService *service.EmailService
 var tagService *tag_service.TagService
 var noteService *note_service.NoteService
+var trashService *note_service.TrashService
 var notebookService *note_service.NotebookService
 var userService *user_service.UserService
 var sessionService *user_service.SessionService

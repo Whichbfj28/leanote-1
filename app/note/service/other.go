@@ -30,4 +30,6 @@ type NoteImageService interface {
 type AttachService interface {
 	CopyAttachs(noteId, toNoteId, toUserId string) bool
 	GetAttachsByNoteIds(noteIds []bson.ObjectId) map[string][]info.Attach
+
+	DeleteAllAttachs(noteId, userId string) bool
 }

@@ -69,7 +69,7 @@ func (m *Note) SetBookID(ctx context.Context, bookID string, newUSN int) error {
 	noteMut := m
 
 	noteMut.SetField("Usn", newUSN)
-	noteMut.SetField("NotebookId", bookID)
+	noteMut.SetField("NotebookId", bson.ObjectIdHex(bookID))
 
 	return nil
 }
