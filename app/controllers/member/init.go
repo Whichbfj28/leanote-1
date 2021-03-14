@@ -2,6 +2,7 @@ package member
 
 import (
 	"github.com/coocn-cn/leanote/app/info"
+	note_service "github.com/coocn-cn/leanote/app/note/service"
 	"github.com/coocn-cn/leanote/app/service"
 
 	//	. "github.com/coocn-cn/leanote/app/lea"
@@ -11,13 +12,12 @@ import (
 
 var userService *service.UserService
 var groupService *service.GroupService
-var noteService *service.NoteService
+var noteService *note_service.NoteService
 var trashService *service.TrashService
-var notebookService *service.NotebookService
+var notebookService *note_service.NotebookService
 var authService *service.AuthService
 var shareService *service.ShareService
 var blogService *service.BlogService
-var tagService *service.TagService
 var pwdService *service.PwdService
 var tokenService *service.TokenService
 var suggestionService *service.SuggestionService
@@ -108,7 +108,6 @@ func InitService() {
 	shareService = service.ShareS
 	userService = service.UserS
 	groupService = service.GroupS
-	tagService = service.TagS
 	blogService = service.BlogS
 	tokenService = service.TokenS
 	noteImageService = service.NoteImageS

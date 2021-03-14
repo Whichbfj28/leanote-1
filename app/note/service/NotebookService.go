@@ -11,6 +11,7 @@ import (
 	. "github.com/coocn-cn/leanote/app/lea"
 	"github.com/coocn-cn/leanote/app/note/model"
 	"github.com/coocn-cn/leanote/app/note/repository"
+	"github.com/coocn-cn/leanote/app/note/repository/mongo"
 	"github.com/coocn-cn/leanote/pkg/errcode"
 	"github.com/coocn-cn/leanote/pkg/log"
 	"gopkg.in/mgo.v2/bson"
@@ -23,6 +24,16 @@ type NotebookService struct {
 	note    repository.NoteRepository
 	book    repository.BookRepository
 	content repository.ContentRepository
+	userSrv UserService
+	blogSrv BlogService
+}
+
+func NewBook(ctx context.Context, userSrv UserService, blogSrv BlogService) *NotebookService {
+	return &NotebookService{
+		note:    mongo.NewNote(ctx),
+		book:    mongo.NewBook(ctx),
+		content: mongo.NewContent(ctx),
+	}
 }
 
 // 排序
@@ -225,7 +236,7 @@ func (m *NotebookService) AddNotebook(notebook info.Notebook) (bool, info.Notebo
 	}
 
 	notebook.UrlTitle = GetUrTitle(notebook.UserId.Hex(), notebook.Title, "notebook", notebook.NotebookId.Hex())
-	notebook.Usn = userService.IncrUsn(notebook.UserId.Hex())
+	notebook.Usn = m.userSrv.IncrUsn(notebook.UserId.Hex())
 	now := time.Now()
 	notebook.CreatedTime = now
 	notebook.UpdatedTime = now
@@ -251,7 +262,7 @@ func (m *NotebookService) UpdateNotebookApi(userId, notebookId, title, parentNot
 			return errcode.NotFound(ctx, "notExists", notebookId)
 		}
 
-		return book.UpdateNotebookApi(ctx, userId, title, parentNotebookId, seq, usn, userService.IncrUsn(userId))
+		return book.UpdateNotebookApi(ctx, userId, title, parentNotebookId, seq, usn, m.userSrv.IncrUsn(userId))
 	})
 	if err != nil {
 		return false, err.Error(), info.Notebook{}
@@ -301,7 +312,7 @@ func (m *NotebookService) UpdateNotebookTitle(notebookId, userId, title string) 
 			return nil
 		}
 
-		return book.UpdateTitle(ctx, userId, title, userService.IncrUsn(userId))
+		return book.UpdateTitle(ctx, userId, title, m.userSrv.IncrUsn(userId))
 	})
 
 	if err != nil {
@@ -322,7 +333,7 @@ func (m *NotebookService) ToBlog(userId, notebookId string, isBlog bool) bool {
 			return nil
 		}
 
-		newUSN := userService.IncrUsn(userId)
+		newUSN := m.userSrv.IncrUsn(userId)
 		err := updateNotes(m.note, ctx, repository.NoteBookID(book.MustData(ctx).NotebookId.Hex()), func(notes []*model.Note) error {
 			ids := make([]string, 0, len(notes))
 			for _, note := range notes {
@@ -357,7 +368,7 @@ func (m *NotebookService) ToBlog(userId, notebookId string, isBlog bool) bool {
 
 	// 重新计算tags
 	go (func() {
-		blogService.ReCountBlogTags(userId)
+		m.blogSrv.ReCountBlogTags(userId)
 	})()
 
 	return true
@@ -391,7 +402,7 @@ func (m *NotebookService) DeleteNotebook(userId, notebookId string) (bool, strin
 			return errcode.FailedPrecondition(ctx, "笔记本下有笔记")
 		}
 
-		return book.SoftDelete(ctx, userService.IncrUsn(userId))
+		return book.SoftDelete(ctx, m.userSrv.IncrUsn(userId))
 	})
 
 	if err != nil {
@@ -443,7 +454,7 @@ func (m *NotebookService) SortNotebooks(userId string, notebookId2Seqs map[strin
 	}
 
 	err := m.updates(ctx, repository.IDs(ids).WithUser(userId), func(book *model.Book) error {
-		return book.SetSortWeight(ctx, notebookId2Seqs[book.MustData(ctx).NotebookId.Hex()], userService.IncrUsn(userId))
+		return book.SetSortWeight(ctx, notebookId2Seqs[book.MustData(ctx).NotebookId.Hex()], m.userSrv.IncrUsn(userId))
 	})
 
 	if err != nil {
@@ -473,7 +484,7 @@ func (m *NotebookService) DragNotebooks(userId string, curNotebookId string, par
 			}
 		}
 
-		return book.SetParent(ctx, perent, userService.IncrUsn(userId))
+		return book.SetParent(ctx, perent, m.userSrv.IncrUsn(userId))
 	})
 
 	if err != nil {

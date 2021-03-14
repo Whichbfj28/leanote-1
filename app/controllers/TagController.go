@@ -17,7 +17,7 @@ type Tag struct {
 func (c Tag) UpdateTag(tag string) revel.Result {
 	ret := info.NewRe()
 	ret.Ok = true
-	ret.Item = tagService.AddOrUpdateTag(c.GetUserId(), tag)
+	ret.Item = noteService.AddOrUpdateTag(c.GetUserId(), tag)
 	return c.RenderJSON(ret)
 }
 
@@ -25,6 +25,6 @@ func (c Tag) UpdateTag(tag string) revel.Result {
 func (c Tag) DeleteTag(tag string) revel.Result {
 	ret := info.Re{}
 	ret.Ok = true
-	ret.Item = tagService.DeleteTag(c.GetUserId(), tag)
+	ret.Item = noteService.DeleteTag(c.GetUserId(), tag)
 	return c.RenderJSON(ret)
 }

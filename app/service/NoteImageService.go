@@ -130,7 +130,7 @@ func (this *NoteImageService) CopyNoteImages(fromNoteId, fromUserId, newNoteId, 
 }
 
 //
-func (this *NoteImageService) getImagesByNoteIds(noteIds []bson.ObjectId) map[string][]info.File {
+func (this *NoteImageService) GetImagesByNoteIds(noteIds []bson.ObjectId) map[string][]info.File {
 	noteNoteImages := []info.NoteImage{}
 	db.ListByQ(db.NoteImages, bson.M{"NoteId": bson.M{"$in": noteIds}}, &noteNoteImages)
 

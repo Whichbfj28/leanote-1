@@ -90,7 +90,7 @@ func (this *TrashService) DeleteTrash(noteId, userId string) bool {
 
 	// 重新统计tag's count
 	// TODO 这里会改变tag's Usn
-	tagService.reCountTagCount(userId, note.Tags)
+	noteService.ReCountTagCount(userId, note.Tags)
 
 	return ok
 }

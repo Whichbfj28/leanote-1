@@ -127,7 +127,7 @@ func (c Note) Index(noteId, online string) revel.Result {
 	c.ViewArgs["noteContentJson"] = noteContent
 	c.ViewArgs["noteContent"] = noteContent.Content
 
-	c.ViewArgs["tags"] = tagService.GetTags(c.GetUserId())
+	c.ViewArgs["tags"] = noteService.GetTags(c.GetUserId())
 
 	c.ViewArgs["globalConfigs"] = configService.GetGlobalConfigForUser()
 

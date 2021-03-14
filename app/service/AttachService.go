@@ -84,7 +84,7 @@ func (this *AttachService) ListAttachs(noteId, userId string) []info.Attach {
 }
 
 // api调用, 通过noteIds得到note's attachs, 通过noteId归类返回
-func (this *AttachService) getAttachsByNoteIds(noteIds []bson.ObjectId) map[string][]info.Attach {
+func (this *AttachService) GetAttachsByNoteIds(noteIds []bson.ObjectId) map[string][]info.Attach {
 	attachs := []info.Attach{}
 	db.ListByQ(db.Attachs, bson.M{"NoteId": bson.M{"$in": noteIds}}, &attachs)
 	noteAttchs := make(map[string][]info.Attach)

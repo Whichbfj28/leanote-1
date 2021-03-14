@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -8,8 +9,8 @@ import (
 
 	"github.com/coocn-cn/leanote/app/db"
 	. "github.com/coocn-cn/leanote/app/lea"
-	"github.com/coocn-cn/leanote/app/note/repository/mongo"
-	tag_mongo "github.com/coocn-cn/leanote/app/tag/repository/mongo"
+	note_service "github.com/coocn-cn/leanote/app/note/service"
+	tag_service "github.com/coocn-cn/leanote/app/tag/service"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -18,13 +19,13 @@ import (
 // 初始化, 实例service
 // 为了共享service
 
-var notebookService, NotebookS *NotebookService
-var noteService, NoteS *NoteService
+var notebookService, NotebookS *note_service.NotebookService
+var noteService, NoteS *note_service.NoteService
 var trashService, TrashS *TrashService
 var shareService, ShareS *ShareService
 var userService, UserS *UserService
 var groupService, GroupS *GroupService
-var tagService, TagS *TagService
+var tagService, TagS *tag_service.TagService
 var blogService, BlogS *BlogService
 var tokenService, TokenS *TokenService
 var noteImageService, NoteImageS *NoteImageService
@@ -42,13 +43,12 @@ var ThemeS, themeService *ThemeService
 
 // onAppStart调用
 func InitService() {
-	NotebookS = &NotebookService{book: mongo.NewBook(nil), note: mongo.NewNote(nil), content: mongo.NewContent(nil)}
-	NoteS = &NoteService{note: mongo.NewNote(nil), history: mongo.NewHistory(nil), content: mongo.NewContent(nil)}
+	ctx := context.Background()
 	TrashS = &TrashService{}
 	ShareS = &ShareService{}
 	UserS = &UserService{}
 	GroupS = &GroupService{}
-	TagS = &TagService{tag: tag_mongo.NewTag(nil), note_tag: mongo.NewTag(nil)}
+	TagS = tag_service.NewTag(ctx)
 	BlogS = &BlogService{}
 	TokenS = &TokenService{}
 	NoteImageS = &NoteImageService{}
@@ -70,7 +70,6 @@ func InitService() {
 	shareService = ShareS
 	userService = UserS
 	groupService = GroupS
-	tagService = TagS
 	blogService = BlogS
 	tokenService = TokenS
 	noteImageService = NoteImageS
@@ -81,6 +80,8 @@ func InitService() {
 	emailService = EmailS
 	sessionService = SessionS
 	themeService = ThemeS
+	NotebookS = note_service.NewBook(ctx, UserS, BlogS)
+	NoteS = note_service.NewNote(ctx, UserS, NotebookS, TagS, ShareS, BlogS, NoteImageS, AttachS, ConfigS)
 }
 
 //----------------
