@@ -4,21 +4,16 @@ import (
 	"github.com/coocn-cn/leanote/app/info"
 	note_service "github.com/coocn-cn/leanote/app/note/service"
 	"github.com/coocn-cn/leanote/app/service"
+	user_service "github.com/coocn-cn/leanote/app/user/service"
 
 	//	. "github.com/coocn-cn/leanote/app/lea"
 	"github.com/revel/revel"
 	//	"strings"
 )
 
-var userService *service.UserService
-var noteService *note_service.NoteService
 var trashService *service.TrashService
-var notebookService *note_service.NotebookService
-var authService *service.AuthService
 var shareService *service.ShareService
 var blogService *service.BlogService
-var pwdService *service.PwdService
-var tokenService *service.TokenService
 var suggestionService *service.SuggestionService
 var albumService *service.AlbumService
 var noteImageService *service.NoteImageService
@@ -27,6 +22,10 @@ var attachService *service.AttachService
 var configService *service.ConfigService
 var emailService *service.EmailService
 var upgradeService *service.UpgradeService
+var noteService *note_service.NoteService
+var notebookService *note_service.NotebookService
+var userService *user_service.UserService
+var authService *user_service.AuthService
 
 // 拦截器
 // 不需要拦截的url
@@ -106,12 +105,10 @@ func InitService() {
 	shareService = service.ShareS
 	userService = service.UserS
 	blogService = service.BlogS
-	tokenService = service.TokenS
 	noteImageService = service.NoteImageS
 	fileService = service.FileS
 	albumService = service.AlbumS
 	attachService = service.AttachS
-	pwdService = service.PwdS
 	suggestionService = service.SuggestionS
 	authService = service.AuthS
 	configService = service.ConfigS

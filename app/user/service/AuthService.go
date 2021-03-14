@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"gopkg.in/mgo.v2/bson"
 	//	"github.com/coocn-cn/leanote/app/db"
 	"github.com/coocn-cn/leanote/app/info"
@@ -16,14 +18,33 @@ import (
 // 登录与权限 Login & Register
 
 type AuthService struct {
+	userSrv     *UserService
+	configSrv   ConfigService
+	shareSrv    ShareService
+	emailSrv    EmailService
+	blogSrv     BlogService
+	noteSrv     NoteService
+	notebookSrv NotebookService
+}
+
+func NewAuth(ctx context.Context, userSrv *UserService, configSrv ConfigService, shareSrv ShareService, emailSrv EmailService, blogSrv BlogService, noteSrv NoteService, notebookSrv NotebookService) *AuthService {
+	return &AuthService{
+		userSrv:     userSrv,
+		configSrv:   configSrv,
+		shareSrv:    shareSrv,
+		emailSrv:    emailSrv,
+		blogSrv:     blogSrv,
+		noteSrv:     noteSrv,
+		notebookSrv: notebookSrv,
+	}
 }
 
 // 使用bcrypt认证或者Md5认证
 // Use bcrypt (Md5 depreciated)
-func (this *AuthService) Login(emailOrUsername, pwd string) (info.User, error) {
+func (m *AuthService) Login(emailOrUsername, pwd string) (info.User, error) {
 	emailOrUsername = strings.Trim(emailOrUsername, " ")
 	//	pwd = strings.Trim(pwd, " ")
-	userInfo := userService.GetUserInfoByName(emailOrUsername)
+	userInfo := m.userSrv.GetUserInfoByName(emailOrUsername)
 	if userInfo.UserId == "" || !ComparePwd(pwd, userInfo.Pwd) {
 		return userInfo, errors.New("wrong username or password")
 	}
@@ -41,9 +62,9 @@ func (this *AuthService) Login(emailOrUsername, pwd string) (info.User, error) {
 // 1. 添加用户
 // 2. 将leanote共享给我
 // [ok]
-func (this *AuthService) Register(email, pwd, fromUserId string) (bool, string) {
+func (m *AuthService) Register(email, pwd, fromUserId string) (bool, string) {
 	// 用户是否已存在
-	if userService.IsExistsUser(email) {
+	if m.userSrv.IsExistsUser(email) {
 		return false, "userHasBeenRegistered-" + email
 	}
 	passwd := GenPwd(pwd)
@@ -54,11 +75,11 @@ func (this *AuthService) Register(email, pwd, fromUserId string) (bool, string) 
 	if fromUserId != "" && IsObjectId(fromUserId) {
 		user.FromUserId = bson.ObjectIdHex(fromUserId)
 	}
-	return this.register(user)
+	return m.register(user)
 }
 
-func (this *AuthService) register(user info.User) (bool, string) {
-	if userService.AddUser(user) {
+func (m *AuthService) register(user info.User) (bool, string) {
+	if m.userSrv.AddUser(user) {
 		// 添加笔记本, 生活, 学习, 工作
 		userId := user.UserId.Hex()
 		notebook := info.Notebook{
@@ -69,49 +90,49 @@ func (this *AuthService) register(user info.User) (bool, string) {
 			notebook.Title = title
 			notebook.NotebookId = objectId
 			notebook.UserId = user.UserId
-			notebookService.AddNotebook(notebook)
+			m.notebookSrv.AddNotebook(notebook)
 		}
 
 		// 添加leanote -> 该用户的共享
-		registerSharedUserId := configService.GetGlobalStringConfig("registerSharedUserId")
+		registerSharedUserId := m.configSrv.GetGlobalStringConfig("registerSharedUserId")
 		if registerSharedUserId != "" {
-			registerSharedNotebooks := configService.GetGlobalArrMapConfig("registerSharedNotebooks")
-			registerSharedNotes := configService.GetGlobalArrMapConfig("registerSharedNotes")
-			registerCopyNoteIds := configService.GetGlobalArrayConfig("registerCopyNoteIds")
+			registerSharedNotebooks := m.configSrv.GetGlobalArrMapConfig("registerSharedNotebooks")
+			registerSharedNotes := m.configSrv.GetGlobalArrMapConfig("registerSharedNotes")
+			registerCopyNoteIds := m.configSrv.GetGlobalArrayConfig("registerCopyNoteIds")
 
 			// 添加共享笔记本
 			for _, notebook := range registerSharedNotebooks {
 				perm, _ := strconv.Atoi(notebook["perm"])
-				shareService.AddShareNotebookToUserId(notebook["notebookId"], perm, registerSharedUserId, userId)
+				m.shareSrv.AddShareNotebookToUserId(notebook["notebookId"], perm, registerSharedUserId, userId)
 			}
 
 			// 添加共享笔记
 			for _, note := range registerSharedNotes {
 				perm, _ := strconv.Atoi(note["perm"])
-				shareService.AddShareNoteToUserId(note["noteId"], perm, registerSharedUserId, userId)
+				m.shareSrv.AddShareNoteToUserId(note["noteId"], perm, registerSharedUserId, userId)
 			}
 
 			// 复制笔记
 			for _, noteId := range registerCopyNoteIds {
-				note := noteService.CopySharedNote(noteId, title2Id["life"].Hex(), registerSharedUserId, user.UserId.Hex())
+				note := m.noteSrv.CopySharedNote(noteId, title2Id["life"].Hex(), registerSharedUserId, user.UserId.Hex())
 				//				Log(noteId)
 				//				Log("Copy")
 				//				LogJ(note)
 				noteUpdate := bson.M{"IsBlog": false} // 不要是博客
-				noteService.UpdateNote(user.UserId.Hex(), note.NoteId.Hex(), noteUpdate, -1)
+				m.noteSrv.UpdateNote(user.UserId.Hex(), note.NoteId.Hex(), noteUpdate, -1)
 			}
 		}
 
 		//---------------
 		// 添加一条userBlog
-		blogService.UpdateUserBlog(info.UserBlog{UserId: user.UserId,
+		m.blogSrv.UpdateUserBlog(info.UserBlog{UserId: user.UserId,
 			Title:      user.Username + " 's Blog",
 			SubTitle:   "Love Leanote!",
 			AboutMe:    "Hello, I am (^_^)",
 			CanComment: true,
 		})
 		// 添加一个单页面
-		blogService.AddOrUpdateSingle(user.UserId.Hex(), "", "About Me", "Hello, I am (^_^)")
+		m.blogSrv.AddOrUpdateSingle(user.UserId.Hex(), "", "About Me", "Hello, I am (^_^)")
 	}
 
 	return true, ""
@@ -121,30 +142,30 @@ func (this *AuthService) register(user info.User) (bool, string) {
 // 第三方注册
 
 // 第三方得到用户名, 可能需要多次判断
-func (this *AuthService) getUsername(thirdType, thirdUsername string) (username string) {
+func (m *AuthService) getUsername(thirdType, thirdUsername string) (username string) {
 	username = thirdType + "-" + thirdUsername
 	i := 1
 	for {
-		if !userService.IsExistsUserByUsername(username) {
+		if !m.userSrv.IsExistsUserByUsername(username) {
 			return
 		}
 		username = fmt.Sprintf("%v%v", username, i)
 	}
 }
 
-func (this *AuthService) ThirdRegister(thirdType, thirdUserId, thirdUsername string) (exists bool, userInfo info.User) {
-	userInfo = userService.GetUserInfoByThirdUserId(thirdUserId)
+func (m *AuthService) ThirdRegister(thirdType, thirdUserId, thirdUsername string) (exists bool, userInfo info.User) {
+	userInfo = m.userSrv.GetUserInfoByThirdUserId(thirdUserId)
 	if userInfo.UserId != "" {
 		exists = true
 		return
 	}
 
-	username := this.getUsername(thirdType, thirdUsername)
+	username := m.getUsername(thirdType, thirdUsername)
 	userInfo = info.User{UserId: bson.NewObjectId(),
 		Username:      username,
 		ThirdUserId:   thirdUserId,
 		ThirdUsername: thirdUsername,
 	}
-	_, _ = this.register(userInfo)
+	_, _ = m.register(userInfo)
 	return
 }

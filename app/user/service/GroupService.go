@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/coocn-cn/leanote/app/db"
 	"github.com/coocn-cn/leanote/app/info"
 
@@ -14,10 +16,19 @@ import (
 // 用户组, 用户组用户管理
 
 type GroupService struct {
+	userSrv  *UserService
+	shareSrv ShareService
+}
+
+func NewGroup(ctx context.Context, userSrv *UserService, shareSrv ShareService) *GroupService {
+	return &GroupService{
+		userSrv:  userSrv,
+		shareSrv: shareSrv,
+	}
 }
 
 // 添加分组
-func (this *GroupService) AddGroup(userId, title string) (bool, info.Group) {
+func (m *GroupService) AddGroup(userId, title string) (bool, info.Group) {
 	group := info.Group{
 		GroupId:     bson.NewObjectId(),
 		UserId:      bson.ObjectIdHex(userId),
@@ -29,20 +40,20 @@ func (this *GroupService) AddGroup(userId, title string) (bool, info.Group) {
 
 // 删除分组
 // 判断是否有好友
-func (this *GroupService) DeleteGroup(userId, groupId string) (ok bool, msg string) {
+func (m *GroupService) DeleteGroup(userId, groupId string) (ok bool, msg string) {
 	/*
 		if db.Has(db.GroupUsers, bson.M{"GroupId": bson.ObjectIdHex(groupId)}) {
 			return false, "groupHasUsers"
 		}
 	*/
-	if !this.isMyGroup(userId, groupId) {
+	if !m.isMyGroup(userId, groupId) {
 		return false, "notMyGroup"
 	}
 
 	// 删除分组后, 需要删除所有用户分享到该组的笔记本, 笔记
 
-	shareService.DeleteAllShareNotebookGroup(groupId)
-	shareService.DeleteAllShareNoteGroup(groupId)
+	m.shareSrv.DeleteAllShareNotebookGroup(groupId)
+	m.shareSrv.DeleteAllShareNoteGroup(groupId)
 
 	db.DeleteAll(db.GroupUsers, bson.M{"GroupId": bson.ObjectIdHex(groupId)})
 	return db.DeleteByIdAndUserId(db.Groups, groupId, userId), ""
@@ -51,30 +62,30 @@ func (this *GroupService) DeleteGroup(userId, groupId string) (ok bool, msg stri
 }
 
 // 修改group标题
-func (this *GroupService) UpdateGroupTitle(userId, groupId, title string) (ok bool) {
+func (m *GroupService) UpdateGroupTitle(userId, groupId, title string) (ok bool) {
 	return db.UpdateByIdAndUserIdField(db.Groups, groupId, userId, "Title", title)
 }
 
 // 得到用户的所有分组(包括下的所有用户)
-func (this *GroupService) GetGroupsAndUsers(userId string) []info.Group {
+func (m *GroupService) GetGroupsAndUsers(userId string) []info.Group {
 	/*
 		// 得到我的分组
 		groups := []info.Group{}
 		db.ListByQ(db.Groups, bson.M{"UserId": bson.ObjectIdHex(userId)}, &groups)
 	*/
 	// 我的分组, 及我所属的分组
-	groups := this.GetGroupsContainOf(userId)
+	groups := m.GetGroupsContainOf(userId)
 
 	// 得到其下的用户
 	for i, group := range groups {
-		group.Users = this.GetUsers(group.GroupId.Hex())
+		group.Users = m.GetUsers(group.GroupId.Hex())
 		groups[i] = group
 	}
 	return groups
 }
 
 // 仅仅得到所有分组
-func (this *GroupService) GetGroups(userId string) []info.Group {
+func (m *GroupService) GetGroups(userId string) []info.Group {
 	// 得到分组s
 	groups := []info.Group{}
 	db.ListByQ(db.Groups, bson.M{"UserId": bson.ObjectIdHex(userId)}, &groups)
@@ -82,20 +93,20 @@ func (this *GroupService) GetGroups(userId string) []info.Group {
 }
 
 // 得到我的和我所属组的ids
-func (this *GroupService) GetMineAndBelongToGroupIds(userId string) []bson.ObjectId {
+func (m *GroupService) GetMineAndBelongToGroupIds(userId string) []bson.ObjectId {
 	// 所属组
-	groupIds := this.GetBelongToGroupIds(userId)
+	groupIds := m.GetBelongToGroupIds(userId)
 
-	m := map[bson.ObjectId]bool{}
+	mg := map[bson.ObjectId]bool{}
 	for _, groupId := range groupIds {
-		m[groupId] = true
+		mg[groupId] = true
 	}
 
 	// 我的组
-	myGroups := this.GetGroups(userId)
+	myGroups := m.GetGroups(userId)
 
 	for _, group := range myGroups {
-		if !m[group.GroupId] {
+		if !mg[group.GroupId] {
 			groupIds = append(groupIds, group.GroupId)
 		}
 	}
@@ -105,9 +116,9 @@ func (this *GroupService) GetMineAndBelongToGroupIds(userId string) []bson.Objec
 
 // 获取包含此用户的组对象数组
 // 获取该用户所属组, 和我的组
-func (this *GroupService) GetGroupsContainOf(userId string) []info.Group {
+func (m *GroupService) GetGroupsContainOf(userId string) []info.Group {
 	// 我的组
-	myGroups := this.GetGroups(userId)
+	myGroups := m.GetGroups(userId)
 	myGroupMap := map[bson.ObjectId]bool{}
 
 	for _, group := range myGroups {
@@ -115,7 +126,7 @@ func (this *GroupService) GetGroupsContainOf(userId string) []info.Group {
 	}
 
 	// 所属组
-	groupIds := this.GetBelongToGroupIds(userId)
+	groupIds := m.GetBelongToGroupIds(userId)
 
 	groups := []info.Group{}
 	db.ListByQ(db.Groups, bson.M{"_id": bson.M{"$in": groupIds}}, &groups)
@@ -129,8 +140,8 @@ func (this *GroupService) GetGroupsContainOf(userId string) []info.Group {
 	return myGroups
 }
 
-// 得到分组, shareService用
-func (this *GroupService) GetGroup(userId, groupId string) info.Group {
+// 得到分组, m.shareSrv用
+func (m *GroupService) GetGroup(userId, groupId string) info.Group {
 	// 得到分组s
 	group := info.Group{}
 	db.GetByIdAndUserId(db.Groups, groupId, userId, &group)
@@ -138,7 +149,7 @@ func (this *GroupService) GetGroup(userId, groupId string) info.Group {
 }
 
 // 得到某分组下的用户
-func (this *GroupService) GetUsers(groupId string) []info.User {
+func (m *GroupService) GetUsers(groupId string) []info.User {
 	// 得到UserIds
 	groupUsers := []info.GroupUser{}
 	db.ListByQWithFields(db.GroupUsers, bson.M{"GroupId": bson.ObjectIdHex(groupId)}, []string{"UserId"}, &groupUsers)
@@ -150,11 +161,11 @@ func (this *GroupService) GetUsers(groupId string) []info.User {
 		userIds[i] = each.UserId
 	}
 	// 得到userInfos
-	return userService.ListUserInfosByUserIds(userIds)
+	return m.userSrv.ListUserInfosByUserIds(userIds)
 }
 
 // 得到我所属的所有分组ids
-func (this *GroupService) GetBelongToGroupIds(userId string) []bson.ObjectId {
+func (m *GroupService) GetBelongToGroupIds(userId string) []bson.ObjectId {
 	// 得到UserIds
 	groupUsers := []info.GroupUser{}
 	db.ListByQWithFields(db.GroupUsers, bson.M{"UserId": bson.ObjectIdHex(userId)}, []string{"GroupId"}, &groupUsers)
@@ -168,14 +179,14 @@ func (this *GroupService) GetBelongToGroupIds(userId string) []bson.ObjectId {
 	return groupIds
 }
 
-func (this *GroupService) isMyGroup(ownUserId, groupId string) (ok bool) {
+func (m *GroupService) isMyGroup(ownUserId, groupId string) (ok bool) {
 	return db.Has(db.Groups, bson.M{"_id": bson.ObjectIdHex(groupId), "UserId": bson.ObjectIdHex(ownUserId)})
 }
 
 // 判断组中是否包含指定用户
-func (this *GroupService) IsExistsGroupUser(userId, groupId string) (ok bool) {
+func (m *GroupService) IsExistsGroupUser(userId, groupId string) (ok bool) {
 	// 如果我拥有这个组, 那也行
-	if this.isMyGroup(userId, groupId) {
+	if m.isMyGroup(userId, groupId) {
 		return true
 	}
 	return db.Has(db.GroupUsers, bson.M{"UserId": bson.ObjectIdHex(userId), "GroupId": bson.ObjectIdHex(groupId)})
@@ -183,14 +194,14 @@ func (this *GroupService) IsExistsGroupUser(userId, groupId string) (ok bool) {
 
 // 为group添加用户
 // 用户是否已存在?
-func (this *GroupService) AddUser(ownUserId, groupId, userId string) (ok bool, msg string) {
+func (m *GroupService) AddUser(ownUserId, groupId, userId string) (ok bool, msg string) {
 	// groupId是否是ownUserId的?
 	/*
-		if !this.IsExistsGroupUser(ownUserId, groupId) {
+		if !m.IsExistsGroupUser(ownUserId, groupId) {
 			return false, "forbiddenNotMyGroup"
 		}
 	*/
-	if !this.isMyGroup(ownUserId, groupId) {
+	if !m.isMyGroup(ownUserId, groupId) {
 		return false, "forbiddenNotMyGroup"
 	}
 
@@ -208,20 +219,20 @@ func (this *GroupService) AddUser(ownUserId, groupId, userId string) (ok bool, m
 }
 
 // 删除用户
-func (this *GroupService) DeleteUser(ownUserId, groupId, userId string) (ok bool, msg string) {
+func (m *GroupService) DeleteUser(ownUserId, groupId, userId string) (ok bool, msg string) {
 	// groupId是否是ownUserId的?
 	/*
-		if !this.IsExistsGroupUser(ownUserId, groupId) {
+		if !m.IsExistsGroupUser(ownUserId, groupId) {
 			return false, "forbiddenNotMyGroup"
 		}
 	*/
-	if !this.isMyGroup(ownUserId, groupId) {
+	if !m.isMyGroup(ownUserId, groupId) {
 		return false, "forbiddenNotMyGroup"
 	}
 
 	// 删除该用户分享到本组的笔记本, 笔记
-	shareService.DeleteShareNotebookGroupWhenDeleteGroupUser(userId, groupId)
-	shareService.DeleteShareNoteGroupWhenDeleteGroupUser(userId, groupId)
+	m.shareSrv.DeleteShareNotebookGroupWhenDeleteGroupUser(userId, groupId)
+	m.shareSrv.DeleteShareNoteGroupWhenDeleteGroupUser(userId, groupId)
 
 	return db.Delete(db.GroupUsers, bson.M{"GroupId": bson.ObjectIdHex(groupId), "UserId": bson.ObjectIdHex(userId)}), ""
 }

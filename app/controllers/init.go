@@ -5,6 +5,7 @@ import (
 	"github.com/coocn-cn/leanote/app/lea/blog"
 	note_service "github.com/coocn-cn/leanote/app/note/service"
 	"github.com/coocn-cn/leanote/app/service"
+	user_service "github.com/coocn-cn/leanote/app/user/service"
 
 	//	. "github.com/coocn-cn/leanote/app/lea"
 	"strings"
@@ -12,15 +13,9 @@ import (
 	"github.com/revel/revel"
 )
 
-var userService *service.UserService
-var noteService *note_service.NoteService
 var trashService *service.TrashService
-var notebookService *note_service.NotebookService
-var authService *service.AuthService
 var shareService *service.ShareService
 var blogService *service.BlogService
-var pwdService *service.PwdService
-var tokenService *service.TokenService
 var suggestionService *service.SuggestionService
 var albumService *service.AlbumService
 var noteImageService *service.NoteImageService
@@ -28,8 +23,14 @@ var fileService *service.FileService
 var attachService *service.AttachService
 var configService *service.ConfigService
 var emailService *service.EmailService
-var sessionService *service.SessionService
 var themeService *service.ThemeService
+var authService *user_service.AuthService
+var userService *user_service.UserService
+var sessionService *user_service.SessionService
+var pwdService *user_service.PwdService
+var tokenService *user_service.TokenService
+var noteService *note_service.NoteService
+var notebookService *note_service.NotebookService
 
 var pageSize = 1000
 var defaultSortField = "UpdatedTime"

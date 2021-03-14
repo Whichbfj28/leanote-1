@@ -6,6 +6,7 @@ import (
 
 	note_service "github.com/coocn-cn/leanote/app/note/service"
 	tag_service "github.com/coocn-cn/leanote/app/tag/service"
+	user_service "github.com/coocn-cn/leanote/app/user/service"
 
 	//		. "github.com/coocn-cn/leanote/app/lea"
 	"strings"
@@ -13,16 +14,9 @@ import (
 	"github.com/revel/revel"
 )
 
-var userService *service.UserService
-var noteService *note_service.NoteService
 var trashService *service.TrashService
-var notebookService *note_service.NotebookService
-var authService *service.AuthService
 var shareService *service.ShareService
 var blogService *service.BlogService
-var tagService *tag_service.TagService
-var pwdService *service.PwdService
-var tokenService *service.TokenService
 var suggestionService *service.SuggestionService
 var albumService *service.AlbumService
 var noteImageService *service.NoteImageService
@@ -30,7 +24,12 @@ var fileService *service.FileService
 var attachService *service.AttachService
 var configService *service.ConfigService
 var emailService *service.EmailService
-var sessionService *service.SessionService
+var tagService *tag_service.TagService
+var noteService *note_service.NoteService
+var notebookService *note_service.NotebookService
+var userService *user_service.UserService
+var sessionService *user_service.SessionService
+var authService *user_service.AuthService
 
 var pageSize = 1000
 var defaultSortField = "UpdatedTime"
@@ -133,12 +132,10 @@ func InitService() {
 	userService = service.UserS
 	tagService = service.TagS
 	blogService = service.BlogS
-	tokenService = service.TokenS
 	noteImageService = service.NoteImageS
 	fileService = service.FileS
 	albumService = service.AlbumS
 	attachService = service.AttachS
-	pwdService = service.PwdS
 	suggestionService = service.SuggestionS
 	authService = service.AuthS
 	configService = service.ConfigS

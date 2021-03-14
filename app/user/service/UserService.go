@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -11,11 +12,24 @@ import (
 )
 
 type UserService struct {
+	emailSrv  EmailService
+	tokenSrv  *TokenService
+	configSrv ConfigService
+	blogSrv   BlogService
+}
+
+func NewUser(ctx context.Context, emailSrv EmailService, tokenSrv *TokenService, configSrv ConfigService, blogSrv BlogService) *UserService {
+	return &UserService{
+		emailSrv:  emailSrv,
+		tokenSrv:  tokenSrv,
+		configSrv: configSrv,
+		blogSrv:   blogSrv,
+	}
 }
 
 // 自增Usn
 // 每次notebook,note添加, 修改, 删除, 都要修改
-func (this *UserService) IncrUsn(userId string) int {
+func (m *UserService) IncrUsn(userId string) int {
 	user := info.User{}
 	query := bson.M{"_id": bson.ObjectIdHex(userId)}
 	db.GetByQWithFields(db.Users, query, []string{"Usn"}, &user)
@@ -27,7 +41,7 @@ func (this *UserService) IncrUsn(userId string) int {
 	//	return db.Update(db.Notes, bson.M{"_id": bson.ObjectIdHex(noteId)}, bson.M{"$inc": bson.M{"ReadNum": 1}})
 }
 
-func (this *UserService) GetUsn(userId string) int {
+func (m *UserService) GetUsn(userId string) int {
 	user := info.User{}
 	query := bson.M{"_id": bson.ObjectIdHex(userId)}
 	db.GetByQWithFields(db.Users, query, []string{"Usn"}, &user)
@@ -35,7 +49,7 @@ func (this *UserService) GetUsn(userId string) int {
 }
 
 // 添加用户
-func (this *UserService) AddUser(user info.User) bool {
+func (m *UserService) AddUser(user info.User) bool {
 	if user.UserId == "" {
 		user.UserId = bson.NewObjectId()
 	}
@@ -46,7 +60,7 @@ func (this *UserService) AddUser(user info.User) bool {
 
 		// 发送验证邮箱
 		go func() {
-			emailService.RegisterSendActiveEmail(user, user.Email)
+			m.emailSrv.RegisterSendActiveEmail(user, user.Email)
 			// 发送给我 life@leanote.com
 			// emailService.SendEmail("life@leanote.com", "新增用户", "{header}用户名"+user.Email+"{footer}")
 		}()
@@ -56,7 +70,7 @@ func (this *UserService) AddUser(user info.User) bool {
 }
 
 // 通过email得到userId
-func (this *UserService) GetUserId(email string) string {
+func (m *UserService) GetUserId(email string) string {
 	email = strings.ToLower(email)
 	user := info.User{}
 	db.GetByQ(db.Users, bson.M{"Email": email}, &user)
@@ -64,47 +78,47 @@ func (this *UserService) GetUserId(email string) string {
 }
 
 // 得到用户名
-func (this *UserService) GetUsername(userId string) string {
+func (m *UserService) GetUsername(userId string) string {
 	user := info.User{}
 	db.GetByQWithFields(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)}, []string{"Username"}, &user)
 	return user.Username
 }
 
 // 得到用户名
-func (this *UserService) GetUsernameById(userId bson.ObjectId) string {
+func (m *UserService) GetUsernameById(userId bson.ObjectId) string {
 	user := info.User{}
 	db.GetByQWithFields(db.Users, bson.M{"_id": userId}, []string{"Username"}, &user)
 	return user.Username
 }
 
 // 是否存在该用户 email
-func (this *UserService) IsExistsUser(email string) bool {
-	if this.GetUserId(email) == "" {
+func (m *UserService) IsExistsUser(email string) bool {
+	if m.GetUserId(email) == "" {
 		return false
 	}
 	return true
 }
 
 // 是否存在该用户 username
-func (this *UserService) IsExistsUserByUsername(username string) bool {
+func (m *UserService) IsExistsUserByUsername(username string) bool {
 	return db.Count(db.Users, bson.M{"Username": username}) >= 1
 }
 
 // 得到用户信息, userId, username, email
-func (this *UserService) GetUserInfoByAny(idEmailUsername string) info.User {
+func (m *UserService) GetUserInfoByAny(idEmailUsername string) info.User {
 	if IsObjectId(idEmailUsername) {
-		return this.GetUserInfo(idEmailUsername)
+		return m.GetUserInfo(idEmailUsername)
 	}
 
 	if strings.Contains(idEmailUsername, "@") {
-		return this.GetUserInfoByEmail(idEmailUsername)
+		return m.GetUserInfoByEmail(idEmailUsername)
 	}
 
 	// username
-	return this.GetUserInfoByUsername(idEmailUsername)
+	return m.GetUserInfoByUsername(idEmailUsername)
 }
 
-func (this *UserService) setUserLogo(user *info.User) {
+func (m *UserService) setUserLogo(user *info.User) {
 	// Logo路径问题, 有些有http: 有些没有
 	if user.Logo == "" {
 		user.Logo = "images/blog/default_avatar.png"
@@ -116,77 +130,77 @@ func (this *UserService) setUserLogo(user *info.User) {
 }
 
 // 仅得到用户
-func (this *UserService) GetUser(userId string) info.User {
+func (m *UserService) GetUser(userId string) info.User {
 	user := info.User{}
 	db.Get(db.Users, userId, &user)
 	return user
 }
 
 // 得到用户信息 userId
-func (this *UserService) GetUserInfo(userId string) info.User {
+func (m *UserService) GetUserInfo(userId string) info.User {
 	user := info.User{}
 	db.Get(db.Users, userId, &user)
 	// Logo路径问题, 有些有http: 有些没有
-	this.setUserLogo(&user)
+	m.setUserLogo(&user)
 	return user
 }
 
 // 得到用户信息 email
-func (this *UserService) GetUserInfoByEmail(email string) info.User {
+func (m *UserService) GetUserInfoByEmail(email string) info.User {
 	user := info.User{}
 	db.GetByQ(db.Users, bson.M{"Email": email}, &user)
 	// Logo路径问题, 有些有http: 有些没有
-	this.setUserLogo(&user)
+	m.setUserLogo(&user)
 	return user
 }
 
 // 得到用户信息 username
-func (this *UserService) GetUserInfoByUsername(username string) info.User {
+func (m *UserService) GetUserInfoByUsername(username string) info.User {
 	user := info.User{}
 	username = strings.ToLower(username)
 	db.GetByQ(db.Users, bson.M{"Username": username}, &user)
 	// Logo路径问题, 有些有http: 有些没有
-	this.setUserLogo(&user)
+	m.setUserLogo(&user)
 	return user
 }
 
-func (this *UserService) GetUserInfoByThirdUserId(thirdUserId string) info.User {
+func (m *UserService) GetUserInfoByThirdUserId(thirdUserId string) info.User {
 	user := info.User{}
 	db.GetByQ(db.Users, bson.M{"ThirdUserId": thirdUserId}, &user)
-	this.setUserLogo(&user)
+	m.setUserLogo(&user)
 	return user
 }
-func (this *UserService) ListUserInfosByUserIds(userIds []bson.ObjectId) []info.User {
+func (m *UserService) ListUserInfosByUserIds(userIds []bson.ObjectId) []info.User {
 	users := []info.User{}
 	db.ListByQ(db.Users, bson.M{"_id": bson.M{"$in": userIds}}, &users)
 	return users
 }
-func (this *UserService) ListUserInfosByEmails(emails []string) []info.User {
+func (m *UserService) ListUserInfosByEmails(emails []string) []info.User {
 	users := []info.User{}
 	db.ListByQ(db.Users, bson.M{"Email": bson.M{"$in": emails}}, &users)
 	return users
 }
 
 // 用户信息即可
-func (this *UserService) MapUserInfoByUserIds(userIds []bson.ObjectId) map[bson.ObjectId]info.User {
+func (m *UserService) MapUserInfoByUserIds(userIds []bson.ObjectId) map[bson.ObjectId]info.User {
 	users := []info.User{}
 	db.ListByQ(db.Users, bson.M{"_id": bson.M{"$in": userIds}}, &users)
 
 	userMap := make(map[bson.ObjectId]info.User, len(users))
 	for _, user := range users {
-		this.setUserLogo(&user)
+		m.setUserLogo(&user)
 		userMap[user.UserId] = user
 	}
 	return userMap
 }
 
 // 用户信息和博客设置信息
-func (this *UserService) MapUserInfoAndBlogInfosByUserIds(userIds []bson.ObjectId) map[bson.ObjectId]info.User {
-	return this.MapUserInfoByUserIds(userIds)
+func (m *UserService) MapUserInfoAndBlogInfosByUserIds(userIds []bson.ObjectId) map[bson.ObjectId]info.User {
+	return m.MapUserInfoByUserIds(userIds)
 }
 
 // 返回info.UserAndBlog
-func (this *UserService) MapUserAndBlogByUserIds(userIds []bson.ObjectId) map[string]info.UserAndBlog {
+func (m *UserService) MapUserAndBlogByUserIds(userIds []bson.ObjectId) map[string]info.UserAndBlog {
 	users := []info.User{}
 	db.ListByQ(db.Users, bson.M{"_id": bson.M{"$in": userIds}}, &users)
 
@@ -201,7 +215,7 @@ func (this *UserService) MapUserAndBlogByUserIds(userIds []bson.ObjectId) map[st
 	userAndBlogMap := make(map[string]info.UserAndBlog, len(users))
 
 	for _, user := range users {
-		this.setUserLogo(&user)
+		m.setUserLogo(&user)
 
 		userBlog, ok := userBlogMap[user.UserId]
 		if !ok {
@@ -215,18 +229,18 @@ func (this *UserService) MapUserAndBlogByUserIds(userIds []bson.ObjectId) map[st
 			Logo:      user.Logo,
 			BlogTitle: userBlog.Title,
 			BlogLogo:  userBlog.Logo,
-			BlogUrl:   blogService.GetUserBlogUrl(&userBlog, user.Username),
+			BlogUrl:   m.blogSrv.GetUserBlogUrl(&userBlog, user.Username),
 		}
 	}
 	return userAndBlogMap
 }
 
 // 得到用户信息+博客主页
-func (this *UserService) GetUserAndBlogUrl(userId string) info.UserAndBlogUrl {
-	user := this.GetUserInfo(userId)
-	userBlog := blogService.GetUserBlog(userId)
+func (m *UserService) GetUserAndBlogUrl(userId string) info.UserAndBlogUrl {
+	user := m.GetUserInfo(userId)
+	userBlog := m.blogSrv.GetUserBlog(userId)
 
-	blogUrls := blogService.GetBlogUrls(&userBlog, &user)
+	blogUrls := m.blogSrv.GetBlogUrls(&userBlog, &user)
 
 	return info.UserAndBlogUrl{
 		User:    user,
@@ -236,9 +250,9 @@ func (this *UserService) GetUserAndBlogUrl(userId string) info.UserAndBlogUrl {
 }
 
 // 得到userAndBlog公开信息
-func (this *UserService) GetUserAndBlog(userId string) info.UserAndBlog {
-	user := this.GetUserInfo(userId)
-	userBlog := blogService.GetUserBlog(userId)
+func (m *UserService) GetUserAndBlog(userId string) info.UserAndBlog {
+	user := m.GetUserInfo(userId)
+	userBlog := m.blogSrv.GetUserBlog(userId)
 	return info.UserAndBlog{
 		UserId:    user.UserId,
 		Username:  user.Username,
@@ -246,13 +260,13 @@ func (this *UserService) GetUserAndBlog(userId string) info.UserAndBlog {
 		Logo:      user.Logo,
 		BlogTitle: userBlog.Title,
 		BlogLogo:  userBlog.Logo,
-		BlogUrl:   blogService.GetUserBlogUrl(&userBlog, user.Username),
-		BlogUrls:  blogService.GetBlogUrls(&userBlog, &user),
+		BlogUrl:   m.blogSrv.GetUserBlogUrl(&userBlog, user.Username),
+		BlogUrls:  m.blogSrv.GetBlogUrls(&userBlog, &user),
 	}
 }
 
 // 通过ids得到users, 按id的顺序组织users
-func (this *UserService) GetUserInfosOrderBySeq(userIds []bson.ObjectId) []info.User {
+func (m *UserService) GetUserInfosOrderBySeq(userIds []bson.ObjectId) []info.User {
 	users := []info.User{}
 	db.ListByQ(db.Users, bson.M{"_id": bson.M{"$in": userIds}}, &users)
 
@@ -273,7 +287,7 @@ func (this *UserService) GetUserInfosOrderBySeq(userIds []bson.ObjectId) []info.
 }
 
 // 使用email(username), 得到用户信息
-func (this *UserService) GetUserInfoByName(emailOrUsername string) info.User {
+func (m *UserService) GetUserInfoByName(emailOrUsername string) info.User {
 	emailOrUsername = strings.ToLower(emailOrUsername)
 
 	user := info.User{}
@@ -282,12 +296,12 @@ func (this *UserService) GetUserInfoByName(emailOrUsername string) info.User {
 	} else {
 		db.GetByQ(db.Users, bson.M{"Username": emailOrUsername}, &user)
 	}
-	this.setUserLogo(&user)
+	m.setUserLogo(&user)
 	return user
 }
 
 // 更新username
-func (this *UserService) UpdateUsername(userId, username string) (bool, string) {
+func (m *UserService) UpdateUsername(userId, username string) (bool, string) {
 	if userId == "" || username == "" || username == "admin" { // admin用户是内置的, 不能设置
 		return false, "usernameIsExisted"
 	}
@@ -305,15 +319,15 @@ func (this *UserService) UpdateUsername(userId, username string) (bool, string) 
 }
 
 // 修改头像
-func (this *UserService) UpdateAvatar(userId, avatarPath string) bool {
+func (m *UserService) UpdateAvatar(userId, avatarPath string) bool {
 	userIdO := bson.ObjectIdHex(userId)
 	return db.UpdateByQField(db.Users, bson.M{"_id": userIdO}, "Logo", avatarPath)
 }
 
 //----------------------
 // 已经登录了的用户修改密码
-func (this *UserService) UpdatePwd(userId, oldPwd, pwd string) (bool, string) {
-	userInfo := this.GetUserInfo(userId)
+func (m *UserService) UpdatePwd(userId, oldPwd, pwd string) (bool, string) {
+	userInfo := m.GetUserInfo(userId)
 	if !ComparePwd(oldPwd, userInfo.Pwd) {
 		return false, "oldPasswordError"
 	}
@@ -328,8 +342,8 @@ func (this *UserService) UpdatePwd(userId, oldPwd, pwd string) (bool, string) {
 }
 
 // 管理员重置密码
-func (this *UserService) ResetPwd(adminUserId, userId, pwd string) (ok bool, msg string) {
-	if configService.GetAdminUserId() != adminUserId {
+func (m *UserService) ResetPwd(adminUserId, userId, pwd string) (ok bool, msg string) {
+	if m.configSrv.GetAdminUserId() != adminUserId {
 		return
 	}
 
@@ -342,13 +356,13 @@ func (this *UserService) ResetPwd(adminUserId, userId, pwd string) (ok bool, msg
 }
 
 // 修改主题
-func (this *UserService) UpdateTheme(userId, theme string) bool {
+func (m *UserService) UpdateTheme(userId, theme string) bool {
 	ok := db.UpdateByQField(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)}, "Theme", theme)
 	return ok
 }
 
 // 帐户类型设置
-func (this *UserService) UpdateAccount(userId, accountType string, accountStartTime, accountEndTime time.Time,
+func (m *UserService) UpdateAccount(userId, accountType string, accountStartTime, accountEndTime time.Time,
 	maxImageNum, maxImageSize, maxAttachNum, maxAttachSize, maxPerAttachSize int) bool {
 	return db.UpdateByQI(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)}, info.UserAccount{
 		AccountType:      accountType,
@@ -366,12 +380,12 @@ func (this *UserService) UpdateAccount(userId, accountType string, accountStartT
 // 修改email
 
 // 注册后验证邮箱
-func (this *UserService) ActiveEmail(token string) (ok bool, msg, email string) {
+func (m *UserService) ActiveEmail(token string) (ok bool, msg, email string) {
 	tokenInfo := info.Token{}
-	if ok, msg, tokenInfo = tokenService.VerifyToken(token, info.TokenActiveEmail); ok {
+	if ok, msg, tokenInfo = m.tokenSrv.VerifyToken(token, info.TokenActiveEmail); ok {
 		// 修改之后的邮箱
 		email = tokenInfo.Email
-		userInfo := this.GetUserInfoByEmail(email)
+		userInfo := m.GetUserInfoByEmail(email)
 		if userInfo.UserId == "" {
 			ok = false
 			msg = "不存在该用户"
@@ -391,13 +405,13 @@ func (this *UserService) ActiveEmail(token string) (ok bool, msg, email string) 
 // 修改邮箱
 // 在此之前, 验证token是否过期
 // 验证email是否有人注册了
-func (this *UserService) UpdateEmail(token string) (ok bool, msg, email string) {
+func (m *UserService) UpdateEmail(token string) (ok bool, msg, email string) {
 	tokenInfo := info.Token{}
-	if ok, msg, tokenInfo = tokenService.VerifyToken(token, info.TokenUpdateEmail); ok {
+	if ok, msg, tokenInfo = m.tokenSrv.VerifyToken(token, info.TokenUpdateEmail); ok {
 		// 修改之后的邮箱
 		email = strings.ToLower(tokenInfo.Email)
 		// 先验证该email是否被注册了
-		if userService.IsExistsUser(email) {
+		if m.IsExistsUser(email) {
 			ok = false
 			msg = "该邮箱已注册"
 			return
@@ -417,19 +431,19 @@ func (this *UserService) UpdateEmail(token string) (ok bool, msg, email string) 
 // 偏好设置
 
 // 宽度
-func (this *UserService) UpdateColumnWidth(userId string, notebookWidth, noteListWidth, mdEditorWidth int) bool {
+func (m *UserService) UpdateColumnWidth(userId string, notebookWidth, noteListWidth, mdEditorWidth int) bool {
 	return db.UpdateByQMap(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)},
 		bson.M{"NotebookWidth": notebookWidth, "NoteListWidth": noteListWidth, "MdEditorWidth": mdEditorWidth})
 }
 
 // 左侧是否隐藏
-func (this *UserService) UpdateLeftIsMin(userId string, leftIsMin bool) bool {
+func (m *UserService) UpdateLeftIsMin(userId string, leftIsMin bool) bool {
 	return db.UpdateByQMap(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)}, bson.M{"LeftIsMin": leftIsMin})
 }
 
 //-------------
 // user admin
-func (this *UserService) ListUsers(pageNumber, pageSize int, sortField string, isAsc bool, email string) (page info.Page, users []info.User) {
+func (m *UserService) ListUsers(pageNumber, pageSize int, sortField string, isAsc bool, email string) (page info.Page, users []info.User) {
 	users = []info.User{}
 	skipNum, sortFieldR := parsePageAndSort(pageNumber, pageSize, sortField, isAsc)
 	query := bson.M{}
@@ -452,7 +466,7 @@ func (this *UserService) ListUsers(pageNumber, pageSize int, sortField string, i
 	return
 }
 
-func (this *UserService) GetAllUserByFilter(userFilterEmail, userFilterWhiteList, userFilterBlackList string, verified bool) []info.User {
+func (m *UserService) GetAllUserByFilter(userFilterEmail, userFilterWhiteList, userFilterBlackList string, verified bool) []info.User {
 	query := bson.M{}
 
 	if verified {
@@ -492,6 +506,6 @@ func (this *UserService) GetAllUserByFilter(userFilterEmail, userFilterWhiteList
 }
 
 // 统计
-func (this *UserService) CountUser() int {
+func (m *UserService) CountUser() int {
 	return db.Count(db.Users, bson.M{})
 }

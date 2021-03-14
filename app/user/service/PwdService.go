@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/coocn-cn/leanote/app/db"
 	"github.com/coocn-cn/leanote/app/info"
 	. "github.com/coocn-cn/leanote/app/lea"
@@ -12,38 +14,49 @@ import (
 var overHours = 2.0 // 小时后过期
 
 type PwdService struct {
+	userSrv  *UserService
+	tokenSrv *TokenService
+	emailSrv EmailService
+}
+
+func NewPWD(ctx context.Context, userSrv *UserService, tokenSrv *TokenService, emailSrv EmailService) *PwdService {
+	return &PwdService{
+		userSrv:  userSrv,
+		tokenSrv: tokenSrv,
+		emailSrv: emailSrv,
+	}
 }
 
 // 1. 找回密码, 通过email找用户,
 // 用户存在, 生成code
-func (this *PwdService) FindPwd(email string) (ok bool, msg string) {
+func (m *PwdService) FindPwd(email string) (ok bool, msg string) {
 	ok = false
-	userId := userService.GetUserId(email)
+	userId := m.userSrv.GetUserId(email)
 	if userId == "" {
 		msg = "用户不存在"
 		return
 	}
 
-	token := tokenService.NewToken(userId, email, info.TokenPwd)
+	token := m.tokenSrv.NewToken(userId, email, info.TokenPwd)
 	if token == "" {
 		return false, "db error"
 	}
 
 	// 发送邮件
-	ok, msg = emailService.FindPwdSendEmail(token, email)
+	ok, msg = m.emailSrv.FindPwdSendEmail(token, email)
 	return
 }
 
 // 重置密码时
 // 修改密码
 // 先验证
-func (this *PwdService) UpdatePwd(token, pwd string) (bool, string) {
+func (m *PwdService) UpdatePwd(token, pwd string) (bool, string) {
 	var tokenInfo info.Token
 	var ok bool
 	var msg string
 
 	// 先验证
-	if ok, msg, tokenInfo = tokenService.VerifyToken(token, info.TokenPwd); !ok {
+	if ok, msg, tokenInfo = m.tokenSrv.VerifyToken(token, info.TokenPwd); !ok {
 		return ok, msg
 	}
 
@@ -56,7 +69,7 @@ func (this *PwdService) UpdatePwd(token, pwd string) (bool, string) {
 	ok = db.UpdateByQField(db.Users, bson.M{"_id": tokenInfo.UserId}, "Pwd", passwd)
 
 	// 删除token
-	tokenService.DeleteToken(tokenInfo.UserId.Hex(), info.TokenPwd)
+	m.tokenSrv.DeleteToken(tokenInfo.UserId.Hex(), info.TokenPwd)
 
 	return ok, ""
 }

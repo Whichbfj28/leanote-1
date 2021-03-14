@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/coocn-cn/leanote/app/db"
 	"github.com/coocn-cn/leanote/app/info"
 
@@ -13,6 +15,10 @@ import (
 
 // Session存储到mongodb中
 type SessionService struct {
+}
+
+func NewSession(ctx context.Context) *SessionService {
+	return &SessionService{}
 }
 
 func (this *SessionService) Update(sessionId, key string, value interface{}) bool {

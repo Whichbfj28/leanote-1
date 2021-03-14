@@ -11,6 +11,7 @@ import (
 	. "github.com/coocn-cn/leanote/app/lea"
 	note_service "github.com/coocn-cn/leanote/app/note/service"
 	tag_service "github.com/coocn-cn/leanote/app/tag/service"
+	user_service "github.com/coocn-cn/leanote/app/user/service"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -19,50 +20,52 @@ import (
 // 初始化, 实例service
 // 为了共享service
 
-var notebookService, NotebookS *note_service.NotebookService
-var noteService, NoteS *note_service.NoteService
 var trashService, TrashS *TrashService
 var shareService, ShareS *ShareService
-var userService, UserS *UserService
-var groupService, GroupS *GroupService
-var tagService, TagS *tag_service.TagService
 var blogService, BlogS *BlogService
-var tokenService, TokenS *TokenService
 var noteImageService, NoteImageS *NoteImageService
 var fileService, FileS *FileService
 var albumService, AlbumS *AlbumService
 var attachService, AttachS *AttachService
 var configService, ConfigS *ConfigService
-var PwdS *PwdService
 var SuggestionS *SuggestionService
 var emailService, EmailS *EmailService
-var AuthS *AuthService
+var AuthS *user_service.AuthService
 var UpgradeS *UpgradeService
-var SessionS, sessionService *SessionService
 var ThemeS, themeService *ThemeService
+var tagService, TagS *tag_service.TagService
+var notebookService, NotebookS *note_service.NotebookService
+var noteService, NoteS *note_service.NoteService
+var PwdS *user_service.PwdService
+var userService, UserS *user_service.UserService
+var groupService, GroupS *user_service.GroupService
+var tokenService, TokenS *user_service.TokenService
+var SessionS, sessionService *user_service.SessionService
 
 // onAppStart调用
 func InitService() {
 	ctx := context.Background()
 	TrashS = &TrashService{}
 	ShareS = &ShareService{}
-	UserS = &UserService{}
-	GroupS = &GroupService{}
-	TagS = tag_service.NewTag(ctx)
 	BlogS = &BlogService{}
-	TokenS = &TokenService{}
 	NoteImageS = &NoteImageService{}
 	FileS = &FileService{}
 	AlbumS = &AlbumService{}
 	AttachS = &AttachService{}
 	ConfigS = &ConfigService{}
-	PwdS = &PwdService{}
 	SuggestionS = &SuggestionService{}
-	AuthS = &AuthService{}
 	EmailS = NewEmailService()
 	UpgradeS = &UpgradeService{}
-	SessionS = &SessionService{}
 	ThemeS = &ThemeService{}
+	SessionS = user_service.NewSession(ctx)
+	TokenS = user_service.NewToken(ctx)
+	UserS = user_service.NewUser(ctx, EmailS, TokenS, ConfigS, BlogS)
+	GroupS = user_service.NewGroup(ctx, UserS, ShareS)
+	PwdS = user_service.NewPWD(ctx, UserS, TokenS, EmailS)
+	TagS = tag_service.NewTag(ctx)
+	NotebookS = note_service.NewBook(ctx, UserS, BlogS)
+	NoteS = note_service.NewNote(ctx, UserS, NotebookS, TagS, ShareS, BlogS, NoteImageS, AttachS, ConfigS)
+	AuthS = user_service.NewAuth(ctx, UserS, ConfigS, ShareS, EmailS, BlogS, NoteS, NotebookS)
 
 	notebookService = NotebookS
 	noteService = NoteS
@@ -80,8 +83,6 @@ func InitService() {
 	emailService = EmailS
 	sessionService = SessionS
 	themeService = ThemeS
-	NotebookS = note_service.NewBook(ctx, UserS, BlogS)
-	NoteS = note_service.NewNote(ctx, UserS, NotebookS, TagS, ShareS, BlogS, NoteImageS, AttachS, ConfigS)
 }
 
 //----------------

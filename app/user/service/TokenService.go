@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"time"
 
 	"github.com/coocn-cn/leanote/app/db"
@@ -14,6 +15,10 @@ import (
 // 修改密码
 
 type TokenService struct {
+}
+
+func NewToken(ctx context.Context) *TokenService {
+	return &TokenService{}
 }
 
 // 生成token

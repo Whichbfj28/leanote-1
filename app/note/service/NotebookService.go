@@ -33,6 +33,8 @@ func NewBook(ctx context.Context, userSrv UserService, blogSrv BlogService) *Not
 		note:    mongo.NewNote(ctx),
 		book:    mongo.NewBook(ctx),
 		content: mongo.NewContent(ctx),
+		userSrv: userSrv,
+		blogSrv: blogSrv,
 	}
 }
 
