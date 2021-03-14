@@ -1,5 +1,6 @@
 # Leanote ([English](https://github.com/coocn-cn/leanote) | [中文](https://github.com/coocn-cn/leanote/blob/master/README_CN.md))
-[![Build Status](https://travis-ci.org/leanote/leanote.svg)](https://travis-ci.org/leanote/leanote)
+
+![Build Status](https://github.com/coocn-cn/leanote/workflows/build/badge.svg)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/leanote/leanote?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## 1. 介绍
