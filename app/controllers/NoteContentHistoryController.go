@@ -19,7 +19,7 @@ func (c NoteContentHistory) ListHistories(noteId string) revel.Result {
 	noteR := mongo.NewNote(nil)
 	historyR := mongo.NewHistory(nil)
 
-	note, err := noteR.Find(ctx, repository.NoteID(noteId))
+	note, err := noteR.Find(ctx, repository.ID(noteId))
 	if err != nil {
 		c.RenderError(err)
 	}

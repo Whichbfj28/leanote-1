@@ -17,6 +17,7 @@ import (
 )
 
 type content struct {
+	baseRepository
 	collection *mgo.Collection
 }
 
@@ -40,7 +41,7 @@ func (m *content) Count(ctx context.Context, predicate repository.Predicater) (i
 
 // Find is 加载一个符合 Predicater 条件的领域对象
 func (m *content) Find(ctx context.Context, predicate repository.Predicater) (*model.Content, error) {
-	contents, err := m.FindAll(ctx, predicate)
+	contents, err := m.FindAll(ctx, repository.NewBuilder(predicate).WithLimit(1))
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,23 @@ func (m *content) Find(ctx context.Context, predicate repository.Predicater) (*m
 // FindAll is 加载所有符合 Predicater 条件的领域对象
 func (m *content) FindAll(ctx context.Context, predicate repository.Predicater) ([]*model.Content, error) {
 	contents := []info.NoteContent{}
-	m.collection.Find(m.predicates(ctx, predicate)).All(&contents)
+	q := m.collection.Find(m.predicates(ctx, predicate))
+
+	if builder, ok := predicate.(repository.PredicateBuilder); ok {
+		params := builder.BuildParams()
+
+		if sort, ok := params["_common_sort"].(string); ok {
+			q = q.Sort(sort)
+		}
+		if skip, ok := params["_common_skip"].(int); ok {
+			q = q.Skip(skip)
+		}
+		if limit, ok := params["_common_limit"].(int); ok {
+			q = q.Limit(limit)
+		}
+	}
+
+	q.All(&contents)
 
 	resp := make([]*model.Content, 0, len(contents))
 	for i := range contents {
@@ -117,21 +134,25 @@ func (m *content) DeleteID(ctx context.Context, ids ...uint64) error {
 }
 
 func (m *content) predicates(ctx context.Context, predicate repository.Predicater) bson.M {
+	var query bson.M
+
 	switch predicate.Predicate() {
-	case "contentNoteID":
+	case "ContentNoteID":
 		params := predicate.Data().(map[string]string)
-		return bson.M{"_id": bson.ObjectIdHex(params["noteID"])}
+		query = bson.M{"_id": bson.ObjectIdHex(params["noteID"])}
 	case "ContentNoteIDs":
 		params := predicate.Data().(map[string][]string)
 
-		ids := params["ids"]
+		ids := params["noteIDs"]
 		hexIDs := make([]bson.ObjectId, 0, len(ids))
 		for _, v := range ids {
 			hexIDs = append(hexIDs, bson.ObjectIdHex(v))
 		}
 
-		return bson.M{"_id": bson.M{"$in": hexIDs}}
+		query = bson.M{"_id": bson.M{"$in": hexIDs}}
+	default:
+		return m.predicateToMongo(ctx, predicate)
 	}
 
-	panic(errcode.Unimplemented(ctx, "加载条件未实现", predicate.Predicate()).Error())
+	return m.commonFields(predicate, query)
 }

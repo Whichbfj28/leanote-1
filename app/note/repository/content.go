@@ -31,19 +31,19 @@ type ContentRepository interface {
 }
 
 // ContentNoteID is 查询条件 - 获取记事的内容
-func ContentNoteID(noteID string) Predicater {
+func ContentNoteID(noteID string) *PredicateBuild {
 	data := map[string]string{
 		"noteID": noteID,
 	}
 
-	return &basePredicate{name: "contentNoteID", data: data}
+	return NewPredicate("ContentNoteID", data)
 }
 
 // ContentNoteID is 查询条件 - 获取记事的内容
-func ContentNoteIDs(noteIDs []string) Predicater {
+func ContentNoteIDs(noteIDs []string) *PredicateBuild {
 	data := map[string][]string{
 		"noteIDs": noteIDs,
 	}
 
-	return &basePredicate{name: "ContentNoteIDs", data: data}
+	return NewPredicate("ContentNoteIDs", data)
 }

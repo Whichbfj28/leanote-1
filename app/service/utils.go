@@ -7,7 +7,7 @@ import (
 	"github.com/coocn-cn/leanote/app/note/repository"
 )
 
-func updateNode(repo repository.NoteRepository, ctx context.Context, predicate repository.Predicater, f func(*model.Note) error) error {
+func updateNote(repo repository.NoteRepository, ctx context.Context, predicate repository.Predicater, f func(*model.Note) error) error {
 	model, err := repo.Find(ctx, predicate)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func updateNode(repo repository.NoteRepository, ctx context.Context, predicate r
 	return repo.Save(ctx, model)
 }
 
-func updateNodes(repo repository.NoteRepository, ctx context.Context, predicate repository.Predicater, f func([]*model.Note) error) error {
+func updateNotes(repo repository.NoteRepository, ctx context.Context, predicate repository.Predicater, f func([]*model.Note) error) error {
 	models, err := repo.FindAll(ctx, predicate)
 	if err != nil {
 		return err

@@ -14,6 +14,7 @@ import (
 )
 
 type history struct {
+	baseRepository
 	collection *mgo.Collection
 }
 
@@ -37,7 +38,7 @@ func (m *history) Count(ctx context.Context, predicate repository.Predicater) (i
 
 // Find is 加载一个符合 Predicater 条件的领域对象
 func (m *history) Find(ctx context.Context, predicate repository.Predicater) (*model.History, error) {
-	historys, err := m.FindAll(ctx, predicate)
+	historys, err := m.FindAll(ctx, repository.NewBuilder(predicate).WithLimit(1))
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +53,23 @@ func (m *history) Find(ctx context.Context, predicate repository.Predicater) (*m
 // FindAll is 加载所有符合 Predicater 条件的领域对象
 func (m *history) FindAll(ctx context.Context, predicate repository.Predicater) ([]*model.History, error) {
 	historys := []info.NoteContentHistory{}
-	m.collection.Find(m.predicates(ctx, predicate)).All(&historys)
+	q := m.collection.Find(m.predicates(ctx, predicate))
+
+	if builder, ok := predicate.(repository.PredicateBuilder); ok {
+		params := builder.BuildParams()
+
+		if sort, ok := params["_common_sort"].(string); ok {
+			q = q.Sort(sort)
+		}
+		if skip, ok := params["_common_skip"].(int); ok {
+			q = q.Skip(skip)
+		}
+		if limit, ok := params["_common_limit"].(int); ok {
+			q = q.Limit(limit)
+		}
+	}
+
+	q.All(&historys)
 
 	resp := make([]*model.History, 0, len(historys))
 	for i := range historys {
@@ -114,14 +131,15 @@ func (m *history) DeleteID(ctx context.Context, ids ...uint64) error {
 }
 
 func (m *history) predicates(ctx context.Context, predicate repository.Predicater) bson.M {
+	var query bson.M
+
 	switch predicate.Predicate() {
-	case "historyNoteID":
+	case "HistoryNoteID":
 		params := predicate.Data().(map[string]string)
-		return bson.M{"_id": bson.ObjectIdHex(params["noteID"])}
-	case "HistoryUserAndID":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"UserId": bson.ObjectIdHex(params["userID"]), "_id": bson.ObjectIdHex(params["id"])}
+		query = bson.M{"_id": bson.ObjectIdHex(params["noteID"])}
+	default:
+		return m.predicateToMongo(ctx, predicate)
 	}
 
-	panic(errcode.Unimplemented(ctx, "加载条件未实现", predicate.Predicate()).Error())
+	return m.commonFields(predicate, query)
 }

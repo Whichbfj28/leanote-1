@@ -30,93 +30,38 @@ type BookRepository interface {
 	DeleteID(ctx context.Context, ids ...string) error
 }
 
-// BookIDs is 查询条件 - 从仓储加载一个领域对象
-func BookID(id string) Predicater {
-	data := map[string]string{
-		"id": id,
-	}
-
-	return &basePredicate{name: "BookID", data: data}
-}
-
-// BookIDs is 查询条件 - 从仓储加载多个领域对象
-func BookIDs(ids []string) Predicater {
-	data := map[string][]string{
-		"ids": ids,
-	}
-
-	return &basePredicate{name: "BookIDs", data: data}
-}
-
-// BookIDs is 查询条件 - 加载多个ID
-func BookUserAndIDs(userID string, ids []string) Predicater {
-	data := map[string][]string{
-		"userID": []string{userID},
-		"ids":    ids,
-	}
-
-	return &basePredicate{name: "BookUserAndIDs", data: data}
-}
-
-// BookUserAndID is 查询条件 - 按用户和 ID 过滤
-func BookUserAndID(userID string, id string) Predicater {
-	data := map[string]string{
-		"userID": userID,
-		"id":     id,
-	}
-
-	return &basePredicate{name: "BookUserAndID", data: data}
-}
-
-// BookUserAndNotDelete is 查询条件 - 获取用户没有被删除的笔记本列表
-func BookUserAndNotDelete(userID string) Predicater {
-	data := map[string]string{
-		"userID": userID,
-	}
-
-	return &basePredicate{name: "BookUserAndNotDelete", data: data}
-}
-
-// BookUserAndParentIDAndDelete is 查询条件 - 按用户, ParentID 和删除状态过滤
-func BookUserAndParentIDAndDelete(userID, parentID string, delete bool) Predicater {
+// BookBookID is 查询条件 - 按用户, BookID, Trash状态和删除状态过滤
+func BookBookID(bookID string) *PredicateBuild {
 	data := map[string]interface{}{
-		"userID":   userID,
-		"parentID": parentID,
-		"delete":   delete,
-	}
-
-	return &basePredicate{name: "BookUserAndParentIDAndDelete", data: data}
-}
-
-// BookUserAndBookIDAndTrashAndDelete is 查询条件 - 按用户, BookID, Trash状态和删除状态过滤
-func BookUserAndBookIDAndTrashAndDelete(userID, bookID string, trash, delete bool) Predicater {
-	data := map[string]interface{}{
-		"userID": userID,
 		"bookID": bookID,
-		"trash":  trash,
-		"delete": delete,
 	}
 
-	return &basePredicate{name: "BookUserAndBookIDAndTrashAndDelete", data: data}
+	return NewPredicate("BookBookID", data)
 }
 
-// BookUserAndURLTitle is 查询条件 - 按用户和 URLTitle 过滤
-func BookUserAndURLTitle(userID string, urlTitle string) Predicater {
+// BookParentID is 查询条件 - 按用户, ParentID 和删除状态过滤
+func BookParentID(parentID string) *PredicateBuild {
+	data := map[string]interface{}{
+		"parentID": parentID,
+	}
+
+	return NewPredicate("BookParentID", data)
+}
+
+// BookNexts is 查询条件 - 获取比指定Usn更新的记录
+func BookNexts(usn int) *PredicateBuild {
+	data := map[string]interface{}{
+		"usn": usn,
+	}
+
+	return NewPredicate("BookNexts", data).WithSort("Usn")
+}
+
+// BookURLTitle is 查询条件 - 按用户和 URLTitle 过滤
+func BookURLTitle(urlTitle string) *PredicateBuild {
 	data := map[string]string{
-		"userID":   userID,
 		"urlTitle": urlTitle,
 	}
 
-	return &basePredicate{name: "BookUserAndURLTitle", data: data}
-}
-
-// BookUSNNextBooks is 查询条件 - 获取比指定Usn更新的记录
-func BookUSNNextBooks(userID string, usn int, count int) Predicater {
-	data := map[string]interface{}{
-		"userID": userID,
-		"usn":    usn,
-		"limit":  count,
-	}
-
-	return &basePredicate{name: "BookUSNNextBooks", data: data}
+	return NewPredicate("BookURLTitle", data)
 }

@@ -31,10 +31,10 @@ type HistoryRepository interface {
 }
 
 // HistoryNoteID is 查询条件 - 获取记事的历史纪录
-func HistoryNoteID(noteID string) Predicater {
+func HistoryNoteID(noteID string) *PredicateBuild {
 	data := map[string]string{
 		"noteID": noteID,
 	}
 
-	return &basePredicate{name: "historyNoteID", data: data}
+	return NewPredicate("HistoryNoteID", data)
 }

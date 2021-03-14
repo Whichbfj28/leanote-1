@@ -17,6 +17,7 @@ import (
 )
 
 type note struct {
+	baseRepository
 	collection *mgo.Collection
 }
 
@@ -42,7 +43,7 @@ func (m *note) Count(ctx context.Context, predicate repository.Predicater) (int,
 
 // Find is 加载一个符合 Predicater 条件的领域对象
 func (m *note) Find(ctx context.Context, predicate repository.Predicater) (*model.Note, error) {
-	notes, err := m.FindAll(ctx, predicate)
+	notes, err := m.FindAll(ctx, repository.NewBuilder(predicate).WithLimit(1))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,31 @@ func (m *note) Find(ctx context.Context, predicate repository.Predicater) (*mode
 // FindAll is 加载所有符合 Predicater 条件的领域对象
 func (m *note) FindAll(ctx context.Context, predicate repository.Predicater) ([]*model.Note, error) {
 	notes := []info.Note{}
-	m.collection.Find(m.predicates(ctx, predicate)).All(&notes)
+	q := m.collection.Find(m.predicates(ctx, predicate))
+
+	if builder, ok := predicate.(repository.PredicateBuilder); ok {
+		params := builder.BuildParams()
+
+		if sort, ok := params["_common_sort"].(string); ok {
+			q = q.Sort(sort)
+		}
+		if skip, ok := params["_common_skip"].(int); ok {
+			q = q.Skip(skip)
+		}
+		if limit, ok := params["_common_limit"].(int); ok {
+			q = q.Limit(limit)
+		}
+		if fields, ok := params["_common_select"].([]string); ok {
+			selector := make(map[string]bool, len(fields))
+			for _, field := range fields {
+				selector[field] = true
+			}
+			q = q.Select(selector)
+		}
+
+	}
+
+	q.All(&notes)
 
 	resp := make([]*model.Note, 0, len(notes))
 	for i := range notes {
@@ -120,27 +145,89 @@ func (m *note) DeleteID(ctx context.Context, ids ...uint64) error {
 }
 
 func (m *note) predicates(ctx context.Context, predicate repository.Predicater) bson.M {
+	var query bson.M
+
 	switch predicate.Predicate() {
-	case "NoteID":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"_id": bson.ObjectIdHex(params["id"])}
-	case "NoteIDAndNotDelete":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"_id": bson.ObjectIdHex(params["id"]), "IsDeleted": false}
-	case "NoteIDs":
-		params := predicate.Data().(map[string][]string)
-
-		ids := params["ids"]
-		hexIDs := make([]bson.ObjectId, 0, len(ids))
-		for _, v := range ids {
-			hexIDs = append(hexIDs, bson.ObjectIdHex(v))
-		}
-
-		return bson.M{"_id": bson.M{"$in": hexIDs}}
 	case "NoteBookID":
 		params := predicate.Data().(map[string]string)
-		return bson.M{"NotebookId": bson.ObjectIdHex(params["bookID"])}
+		query = bson.M{"NotebookId": bson.ObjectIdHex(params["bookID"])}
+	case "NoteIDAndBlog":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"_id": bson.ObjectIdHex(params["id"].(string)),
+		}
+
+		if params["blog"].(bool) {
+			query["IsBlog"] = true
+		}
+	case "NoteSrc":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"Src": params["src"].(string),
+		}
+	case "NoteBlog":
+		query = bson.M{
+			"IsBlog": true,
+		}
+	case "NoteTags":
+		params := predicate.Data().(map[string]interface{})
+
+		ids := params["tags"].([]string)
+		hexTags := make([]bson.ObjectId, 0, len(ids))
+		for _, v := range ids {
+			hexTags = append(hexTags, bson.ObjectIdHex(v))
+		}
+
+		query = bson.M{
+			"Tags": bson.M{"$in": hexTags},
+		}
+	case "NoteNexts":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"Usn": bson.M{"$gt": params["usn"].(int)},
+		}
+	case "NoteBookIDAndBlog":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"NotebookId": bson.ObjectIdHex(params["bookID"].(string)),
+		}
+
+		if params["blog"].(bool) {
+			query["IsBlog"] = true
+		}
+	case "NoteSearchTags":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"Tags": bson.M{"$all": params["tags"].([]string)},
+		}
+	case "NoteSearchTitleAndDesc":
+		params := predicate.Data().(map[string]interface{})
+
+		// 利用标题和desc, 不用content,不是trash的
+		key := params["query"].(string)
+		query = bson.M{
+			"_id": bson.M{"$nin": params["excludeIDs"].([]string)},
+			"$or": []bson.M{
+				{"Title": bson.M{"$regex": bson.RegEx{".*?" + key + ".*", "i"}}},
+				{"Desc": bson.M{"$regex": bson.RegEx{".*?" + key + ".*", "i"}}},
+			},
+		}
+	case "NoteSearchContent":
+		params := predicate.Data().(map[string]interface{})
+
+		// 利用标题和desc, 不用content,不是trash的
+		key := params["query"].(string)
+		query = bson.M{
+			"_id":     bson.M{"$nin": params["excludeIDs"].([]string)},
+			"Content": bson.M{"$regex": bson.RegEx{".*?" + key + ".*", "i"}},
+		}
+
+		if params["blog"].(bool) {
+			query["IsBlog"] = true
+		}
+	default:
+		return m.predicateToMongo(ctx, predicate)
 	}
 
-	panic(errcode.Unimplemented(ctx, "加载条件未实现", predicate.Predicate()).Error())
+	return m.commonFields(predicate, query)
 }

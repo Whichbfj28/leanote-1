@@ -118,7 +118,7 @@ func (this *NotebookService) GetNotebookById(notebookId string) info.Notebook {
 	m := this
 	ctx := context.Background()
 
-	book, err := m.book.Find(ctx, repository.BookID(notebookId))
+	book, err := m.book.Find(ctx, repository.ID(notebookId))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return info.Notebook{}
@@ -137,9 +137,9 @@ func (this *NotebookService) GetNotebookByUserIdAndUrlTitle(userId, notebookIdOr
 
 	var predicate repository.Predicater
 	if IsObjectId(notebookIdOrUrlTitle) {
-		predicate = repository.BookID(notebookIdOrUrlTitle)
+		predicate = repository.ID(notebookIdOrUrlTitle)
 	} else {
-		predicate = repository.BookUserAndURLTitle(userId, notebookIdOrUrlTitle)
+		predicate = repository.BookURLTitle(notebookIdOrUrlTitle).WithUser(userId)
 	}
 
 	book, err := m.book.Find(ctx, predicate)
@@ -159,7 +159,7 @@ func (this *NotebookService) GetNotebookByUserIdAndUrlTitle(userId, notebookIdOr
 func (m *NotebookService) GeSyncNotebooks(userId string, afterUsn, maxEntry int) []info.Notebook {
 	ctx := context.Background()
 
-	books, err := m.book.FindAll(ctx, repository.BookUSNNextBooks(userId, afterUsn, maxEntry))
+	books, err := m.book.FindAll(ctx, repository.BookNexts(afterUsn).WithUser(userId).WithLimit(maxEntry))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return nil
@@ -179,7 +179,7 @@ func (m *NotebookService) GeSyncNotebooks(userId string, afterUsn, maxEntry int)
 func (m *NotebookService) GetNotebooks(userId string) info.SubNotebooks {
 	ctx := context.Background()
 
-	userNotebooks, err := m.book.FindAll(ctx, repository.BookUserAndNotDelete(userId))
+	userNotebooks, err := m.book.FindAll(ctx, repository.User(userId).WithDeleted(false))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return nil
@@ -203,7 +203,7 @@ func (m *NotebookService) GetNotebooksByNotebookIds(notebookIds []bson.ObjectId)
 		ids = append(ids, v.Hex())
 	}
 
-	userNotebooks, err := m.book.FindAll(ctx, repository.BookIDs(ids))
+	userNotebooks, err := m.book.FindAll(ctx, repository.IDs(ids))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return nil
@@ -246,7 +246,7 @@ func (m *NotebookService) UpdateNotebookApi(userId, notebookId, title, parentNot
 		return false, "notebookIdNotExists", info.Notebook{}
 	}
 
-	err := m.update(ctx, repository.BookUserAndID(userId, notebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(notebookId).WithUser(userId), func(book *model.Book) error {
 		if book == nil {
 			return errcode.NotFound(ctx, "notExists", notebookId)
 		}
@@ -265,7 +265,7 @@ func (this *NotebookService) IsBlog(notebookId string) bool {
 	m := this
 	ctx := context.Background()
 
-	book, err := m.book.Find(ctx, repository.BookID(notebookId))
+	book, err := m.book.Find(ctx, repository.ID(notebookId))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return false
@@ -282,7 +282,7 @@ func (this *NotebookService) IsBlog(notebookId string) bool {
 func (m *NotebookService) IsMyNotebook(notebookId, userId string) bool {
 	ctx := context.Background()
 
-	count, err := m.book.Count(ctx, repository.BookUserAndID(userId, notebookId))
+	count, err := m.book.Count(ctx, repository.ID(notebookId).WithUser(userId))
 	if err != nil {
 		log.G(ctx).WithError(err).Error("获取笔记本失败")
 		return false
@@ -296,7 +296,7 @@ func (m *NotebookService) IsMyNotebook(notebookId, userId string) bool {
 func (m *NotebookService) UpdateNotebookTitle(notebookId, userId, title string) bool {
 	ctx := context.Background()
 
-	err := m.update(ctx, repository.BookUserAndID(userId, notebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(notebookId).WithUser(userId), func(book *model.Book) error {
 		if book == nil {
 			return nil
 		}
@@ -317,13 +317,13 @@ func (m *NotebookService) ToBlog(userId, notebookId string, isBlog bool) bool {
 	ctx := context.Background()
 
 	// 笔记本
-	err := m.update(ctx, repository.BookUserAndID(userId, notebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(notebookId).WithUser(userId), func(book *model.Book) error {
 		if book == nil {
 			return nil
 		}
 
 		newUSN := userService.IncrUsn(userId)
-		err := updateNodes(m.note, ctx, repository.NoteBookID(book.MustData(ctx).NotebookId.Hex()), func(notes []*model.Note) error {
+		err := updateNotes(m.note, ctx, repository.NoteBookID(book.MustData(ctx).NotebookId.Hex()), func(notes []*model.Note) error {
 			ids := make([]string, 0, len(notes))
 			for _, note := range notes {
 				ids = append(ids, note.MustData(ctx).NoteId.Hex())
@@ -366,14 +366,14 @@ func (m *NotebookService) ToBlog(userId, notebookId string, isBlog bool) bool {
 func (m *NotebookService) DeleteNotebook(userId, notebookId string) (bool, string) {
 	ctx := context.Background()
 
-	err := m.update(ctx, repository.BookUserAndID(userId, notebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(notebookId).WithUser(userId), func(book *model.Book) error {
 		if book == nil {
 			return nil
 		}
 
 		data := book.MustData(ctx)
 
-		childs, err := m.book.FindAll(ctx, repository.BookUserAndParentIDAndDelete(data.UserId.Hex(), data.NotebookId.Hex(), false))
+		childs, err := m.book.FindAll(ctx, repository.BookParentID(data.NotebookId.Hex()).WithUser(data.UserId.Hex()).WithDeleted(false))
 		if err != nil {
 			return err
 		}
@@ -406,7 +406,7 @@ func (m *NotebookService) DeleteNotebook(userId, notebookId string) (bool, strin
 func (m *NotebookService) DeleteNotebookForce(userId, notebookId string, usn int) (bool, string) {
 	ctx := context.Background()
 
-	book, err := m.book.Find(ctx, repository.BookUserAndID(userId, notebookId))
+	book, err := m.book.Find(ctx, repository.ID(notebookId).WithUser(userId))
 	if err != nil {
 		return false, err.Error()
 	}
@@ -442,7 +442,7 @@ func (m *NotebookService) SortNotebooks(userId string, notebookId2Seqs map[strin
 		ids = append(ids, id)
 	}
 
-	err := m.updates(ctx, repository.BookUserAndIDs(userId, ids), func(book *model.Book) error {
+	err := m.updates(ctx, repository.IDs(ids).WithUser(userId), func(book *model.Book) error {
 		return book.SetSortWeight(ctx, notebookId2Seqs[book.MustData(ctx).NotebookId.Hex()], userService.IncrUsn(userId))
 	})
 
@@ -458,7 +458,7 @@ func (m *NotebookService) SortNotebooks(userId string, notebookId2Seqs map[strin
 func (m *NotebookService) DragNotebooks(userId string, curNotebookId string, parentNotebookId string, siblings []string) bool {
 	ctx := context.Background()
 
-	err := m.update(ctx, repository.BookUserAndID(userId, curNotebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(curNotebookId).WithUser(userId), func(book *model.Book) error {
 		if book == nil {
 			return nil
 		}
@@ -467,7 +467,7 @@ func (m *NotebookService) DragNotebooks(userId string, curNotebookId string, par
 		var perent *model.Book = nil
 
 		if parentNotebookId != "" {
-			perent, err = m.book.Find(ctx, repository.BookID(parentNotebookId))
+			perent, err = m.book.Find(ctx, repository.ID(parentNotebookId))
 			if err != nil {
 				return err
 			}
@@ -496,7 +496,7 @@ func (m *NotebookService) DragNotebooks(userId string, curNotebookId string, par
 func (m *NotebookService) ReCountNotebookNumberNotes(notebookId string) bool {
 	ctx := context.Background()
 
-	err := m.update(ctx, repository.BookID(notebookId), func(book *model.Book) error {
+	err := m.update(ctx, repository.ID(notebookId), func(book *model.Book) error {
 		if book == nil {
 			return nil
 		}

@@ -42,7 +42,7 @@ var ThemeS, themeService *ThemeService
 // onAppStart调用
 func InitService() {
 	NotebookS = &NotebookService{book: mongo.NewBook(nil), note: mongo.NewNote(nil), content: mongo.NewContent(nil)}
-	NoteS = &NoteService{}
+	NoteS = &NoteService{note: mongo.NewNote(nil), history: mongo.NewHistory(nil), content: mongo.NewContent(nil)}
 	TrashS = &TrashService{}
 	ShareS = &ShareService{}
 	UserS = &UserService{}

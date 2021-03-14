@@ -17,6 +17,7 @@ import (
 )
 
 type book struct {
+	baseRepository
 	collection *mgo.Collection
 }
 
@@ -42,7 +43,7 @@ func (m *book) Count(ctx context.Context, predicate repository.Predicater) (int,
 
 // Find is 加载一个符合 Predicater 条件的领域对象
 func (m *book) Find(ctx context.Context, predicate repository.Predicater) (*model.Book, error) {
-	books, err := m.FindAll(ctx, predicate)
+	books, err := m.FindAll(ctx, repository.NewBuilder(predicate).WithLimit(1))
 	if err != nil {
 		return nil, err
 	}
@@ -56,18 +57,24 @@ func (m *book) Find(ctx context.Context, predicate repository.Predicater) (*mode
 
 // FindAll is 加载所有符合 Predicater 条件的领域对象
 func (m *book) FindAll(ctx context.Context, predicate repository.Predicater) ([]*model.Book, error) {
-	// 先查是否存在历史记录, 没有则添加之
 	books := []info.Notebook{}
+	q := m.collection.Find(m.predicates(ctx, predicate))
 
-	switch predicate.Predicate() {
-	case "BookUSNNextBooks":
-		params := predicate.Data().(map[string]interface{})
+	if builder, ok := predicate.(repository.PredicateBuilder); ok {
+		params := builder.BuildParams()
 
-		q := m.collection.Find(m.predicates(ctx, predicate))
-		q.Sort("Usn").Limit(params["limit"].(int)).All(&books)
-	default:
-		m.collection.Find(m.predicates(ctx, predicate)).All(&books)
+		if sort, ok := params["_common_sort"].(string); ok {
+			q = q.Sort(sort)
+		}
+		if skip, ok := params["_common_skip"].(int); ok {
+			q = q.Skip(skip)
+		}
+		if limit, ok := params["_common_limit"].(int); ok {
+			q = q.Limit(limit)
+		}
 	}
+
+	q.All(&books)
 
 	resp := make([]*model.Book, 0, len(books))
 	for i := range books {
@@ -132,63 +139,30 @@ func (m *book) DeleteID(ctx context.Context, ids ...string) error {
 }
 
 func (m *book) predicates(ctx context.Context, predicate repository.Predicater) bson.M {
+	var query bson.M
+
 	switch predicate.Predicate() {
-	case "BookID":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"_id": bson.ObjectIdHex(params["id"])}
-	case "BookIDs":
-		params := predicate.Data().(map[string][]string)
-
-		ids := params["ids"]
-		hexIDs := make([]bson.ObjectId, 0, len(ids))
-		for _, v := range ids {
-			hexIDs = append(hexIDs, bson.ObjectIdHex(v))
-		}
-
-		return bson.M{"_id": bson.M{"$in": hexIDs}}
-	case "BookUserAndIDs":
-		params := predicate.Data().(map[string][]string)
-
-		ids := params["ids"]
-		hexIDs := make([]bson.ObjectId, 0, len(ids))
-		for _, v := range ids {
-			hexIDs = append(hexIDs, bson.ObjectIdHex(v))
-		}
-
-		return bson.M{"UserId": bson.ObjectIdHex(params["userID"][0]), "_id": bson.M{"$in": hexIDs}}
-	case "BookUserAndID":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"UserId": bson.ObjectIdHex(params["userID"]), "_id": bson.ObjectIdHex(params["id"])}
-	case "BookUserAndParentIDAndDelete":
+	case "BookBookID":
 		params := predicate.Data().(map[string]interface{})
-		return bson.M{
-			"ParentNotebookId": bson.ObjectIdHex(params["parentID"].(string)),
-			"UserId":           bson.ObjectIdHex(params["userID"].(string)),
-			"IsDeleted":        params["delete"].(bool),
-		}
-	case "BookUserAndBookIDAndTrashAndDelete":
-		params := predicate.Data().(map[string]interface{})
-		return bson.M{
-			"UserId":     bson.ObjectIdHex(params["userID"].(string)),
+		query = bson.M{
 			"NotebookId": bson.ObjectIdHex(params["bookID"].(string)),
-			"IsTrash":    params["trash"].(bool),
-			"IsDeleted":  params["delete"].(bool),
 		}
-	case "BookUserAndNotDelete":
-		params := predicate.Data().(map[string]string)
-		return bson.M{
-			"UserId": bson.ObjectIdHex(params["userID"]),
-			"$or": []bson.M{
-				{"IsDeleted": false},
-				{"IsDeleted": bson.M{"$exists": false}},
-			}}
-	case "BookUserAndURLTitle":
-		params := predicate.Data().(map[string]string)
-		return bson.M{"UserId": bson.ObjectIdHex(params["userID"]), "UrlTitle": encodeValue(params["urlTitle"])}
-	case "BookUSNNextBooks":
+	case "BookParentID":
 		params := predicate.Data().(map[string]interface{})
-		return bson.M{"UserId": bson.ObjectIdHex(params["userID"].(string)), "Usn": bson.M{"$gt": params["usn"].(int)}}
+		query = bson.M{
+			"ParentNotebookId": bson.ObjectIdHex(params["parentID"].(string)),
+		}
+	case "BookNexts":
+		params := predicate.Data().(map[string]interface{})
+		query = bson.M{
+			"Usn": bson.M{"$gt": params["usn"].(int)},
+		}
+	case "BookURLTitle":
+		params := predicate.Data().(map[string]string)
+		query = bson.M{"UrlTitle": encodeValue(params["urlTitle"])}
+	default:
+		return m.predicateToMongo(ctx, predicate)
 	}
 
-	panic(errcode.Unimplemented(ctx, "加载条件未实现", predicate.Predicate()).Error())
+	return m.commonFields(predicate, query)
 }
