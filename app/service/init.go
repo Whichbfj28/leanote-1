@@ -9,6 +9,7 @@ import (
 	"github.com/coocn-cn/leanote/app/db"
 	. "github.com/coocn-cn/leanote/app/lea"
 	"github.com/coocn-cn/leanote/app/note/repository/mongo"
+	tag_mongo "github.com/coocn-cn/leanote/app/tag/repository/mongo"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -47,7 +48,7 @@ func InitService() {
 	ShareS = &ShareService{}
 	UserS = &UserService{}
 	GroupS = &GroupService{}
-	TagS = &TagService{}
+	TagS = &TagService{tag: tag_mongo.NewTag(nil), note_tag: mongo.NewTag(nil)}
 	BlogS = &BlogService{}
 	TokenS = &TokenService{}
 	NoteImageS = &NoteImageService{}

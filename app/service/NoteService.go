@@ -476,7 +476,7 @@ func (this *NoteService) UpdateNote(updatedUserId, noteId string, needUpdate bso
 	ctx := context.Background()
 
 	userId := ""
-	newUSN := userService.IncrUsn(userId)
+	newUSN := 0
 	needRecountTags := false
 	err := updateNote(this.note, ctx, repository.ID(noteId), func(note *model.Note) error {
 		// 是否存在
@@ -530,6 +530,7 @@ func (this *NoteService) UpdateNote(updatedUserId, noteId string, needUpdate bso
 			}
 		}
 
+		newUSN = userService.IncrUsn(userId)
 		return note.Updete_needdelete_(ctx, needUpdate, updatedUserId, newUSN)
 	})
 	if err != nil {

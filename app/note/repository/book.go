@@ -6,8 +6,8 @@ import (
 	"github.com/coocn-cn/leanote/app/note/model"
 )
 
-//xgo:generate gex implgen -destination git/$GOFILE -package git -impl_names BookRepository=Book -source $GOFILE
-//go:generate gex implgen -destination mongo/$GOFILE -package mongo -impl_names BookRepository=Book -source $GOFILE
+//xgo:generate gex implgen -destination git/$GOFILE -package git -impl_names BookRepository=book -source $GOFILE
+//go:generate gex implgen -destination mongo/$GOFILE -package mongo -impl_names BookRepository=book -source $GOFILE
 //go:generate gex mockgen -destination mock/$GOFILE -package mock -source $GOFILE
 
 type BookRepository interface {

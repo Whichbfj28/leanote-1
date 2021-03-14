@@ -73,3 +73,19 @@ func (m *noteData) db() *info.Note {
 func (m *noteData) Data(ctx context.Context) (data model.NoteData, err error) {
 	return data, m.baseMutation.Data(ctx, &data)
 }
+
+type tagMutation struct {
+	*baseMutation
+}
+
+func newtagMutation(data model.TagData, db *info.NoteTag) *tagMutation {
+	return &tagMutation{baseMutation: newbaseMutation(data, db)}
+}
+
+func (m *tagMutation) db() *info.NoteTag {
+	return m.baseMutation.db.(*info.NoteTag)
+}
+
+func (m *tagMutation) Data(ctx context.Context) (data model.TagData, err error) {
+	return data, m.baseMutation.Data(ctx, &data)
+}

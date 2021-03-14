@@ -173,9 +173,9 @@ func (m *note) predicates(ctx context.Context, predicate repository.Predicater) 
 		params := predicate.Data().(map[string]interface{})
 
 		ids := params["tags"].([]string)
-		hexTags := make([]bson.ObjectId, 0, len(ids))
+		hexTags := make([]string, 0, len(ids))
 		for _, v := range ids {
-			hexTags = append(hexTags, bson.ObjectIdHex(v))
+			hexTags = append(hexTags, v)
 		}
 
 		query = bson.M{

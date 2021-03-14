@@ -1,11 +1,17 @@
 package service
 
 import (
+	"context"
 	"time"
 
-	"github.com/coocn-cn/leanote/app/db"
 	"github.com/coocn-cn/leanote/app/info"
-	. "github.com/coocn-cn/leanote/app/lea"
+	note_model "github.com/coocn-cn/leanote/app/note/model"
+	"github.com/coocn-cn/leanote/app/note/repository"
+	note_repo "github.com/coocn-cn/leanote/app/note/repository"
+	tag_model "github.com/coocn-cn/leanote/app/tag/model"
+	tag_repo "github.com/coocn-cn/leanote/app/tag/repository"
+	"github.com/coocn-cn/leanote/pkg/errcode"
+	"github.com/coocn-cn/leanote/pkg/log"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -13,30 +19,29 @@ import (
 每添加,更新note时, 都将tag添加到tags表中
 */
 type TagService struct {
+	tag      tag_repo.TagRepository
+	note_tag note_repo.TagRepository
 }
-
-/*
-func (this *TagService) GetTags(userId string) []string {
-	tag := info.Tag{}
-	db.Get(db.Tags, userId, &tag)
-	LogJ(tag)
-	return tag.Tags
-}
-*/
 
 func (this *TagService) AddTagsI(userId string, tags interface{}) bool {
-	if ts, ok2 := tags.([]string); ok2 {
+	if ts, ok := tags.([]string); ok {
 		return this.AddTags(userId, ts)
 	}
 	return false
 }
-func (this *TagService) AddTags(userId string, tags []string) bool {
-	for _, tag := range tags {
-		if !db.Upsert(db.Tags,
-			bson.M{"_id": bson.ObjectIdHex(userId)},
-			bson.M{"$addToSet": bson.M{"Tags": tag}}) {
-			return false
+
+func (m *TagService) AddTags(userId string, tags []string) bool {
+	ctx := context.Background()
+
+	err := updateTag(m.tag, ctx, repository.User(userId), func(tag *tag_model.Tag) error {
+		if tag == nil {
+			return errcode.NotFound(ctx, "notExists", userId)
 		}
+
+		return tag.AddTags(ctx, tags)
+	})
+	if err != nil {
+		return false
 	}
 	return true
 }
@@ -50,81 +55,109 @@ func (this *TagService) AddTags(userId string, tags []string) bool {
 // 什么时候调用? 笔记添加Tag, 删除Tag时
 // 删除note时, 都可以调用
 // 万能
-func (this *TagService) AddOrUpdateTag(userId string, tag string) info.NoteTag {
-	userIdO := bson.ObjectIdHex(userId)
-	noteTag := info.NoteTag{}
-	db.GetByQ(db.NoteTags, bson.M{"UserId": userIdO, "Tag": tag}, &noteTag)
+func (m *TagService) AddOrUpdateTag(userId string, tag string) info.NoteTag {
+	ctx := context.Background()
 
-	// 存在, 则更新之
-	if noteTag.TagId != "" {
-		// 统计note数
-		count := noteService.CountNoteByTag(userId, tag)
-		noteTag.Count = count
-		noteTag.UpdatedTime = time.Now()
-		//		noteTag.Usn = userService.IncrUsn(userId), 更新count而已
-
-		// 之前删除过的, 现在要添加回来了
-		if noteTag.IsDeleted {
-			Log("之前删除过的, 现在要添加回来了:  " + tag)
-			noteTag.Usn = userService.IncrUsn(userId)
-			noteTag.IsDeleted = false
-		}
-
-		db.UpdateByIdAndUserId(db.NoteTags, noteTag.TagId.Hex(), userId, noteTag)
-		return noteTag
+	modelTag, err := m.note_tag.Find(ctx, tag_repo.TagTag(tag).WithUser(userId))
+	if err != nil {
+		log.G(ctx).WithError(err).Error("查询笔记tag失败")
+		return info.NoteTag{}
 	}
 
-	// 不存在, 则创建之
-	noteTag.TagId = bson.NewObjectId()
-	noteTag.Count = 1
-	noteTag.Tag = tag
-	noteTag.UserId = bson.ObjectIdHex(userId)
-	noteTag.CreatedTime = time.Now()
-	noteTag.UpdatedTime = noteTag.CreatedTime
-	noteTag.Usn = userService.IncrUsn(userId)
-	noteTag.IsDeleted = false
-	db.Insert(db.NoteTags, noteTag)
+	noteTag := note_model.TagData{}
+	if modelTag == nil {
+		// 不存在, 则创建之
+		noteTag.TagId = bson.NewObjectId()
+		noteTag.Count = 1
+		noteTag.Tag = tag
+		noteTag.UserId = bson.ObjectIdHex(userId)
+		noteTag.CreatedTime = time.Now()
+		noteTag.UpdatedTime = time.Now()
+		noteTag.Usn = userService.IncrUsn(userId)
+		noteTag.IsDeleted = false
 
-	return noteTag
+		modelTag = m.note_tag.New(ctx, noteTag)
+	} else {
+		// 更新 note 数
+		modelTag.SetCount(ctx, noteService.CountNoteByTag(userId, tag))
+	}
+
+	// 之前删除过的, 现在要添加回来了
+	log.G(ctx).WithField("tag", tag).Info("之前删除过的, 现在要添加回来了")
+	modelTag.SoftDelete(ctx, false, userService.IncrUsn(userId))
+
+	if err := m.note_tag.Save(ctx, modelTag); err != nil {
+		log.G(ctx).WithError(err).Error("保存笔记tag失败")
+		return info.NoteTag{}
+	}
+
+	return info.NoteTag(modelTag.MustData(ctx))
 }
 
 // 得到标签, 按更新时间来排序
-func (this *TagService) GetTags(userId string) []info.NoteTag {
-	tags := []info.NoteTag{}
-	query := bson.M{"UserId": bson.ObjectIdHex(userId), "IsDeleted": false}
-	q := db.NoteTags.Find(query)
-	sortFieldR := "-UpdatedTime"
-	q.Sort(sortFieldR).All(&tags)
-	return tags
+func (m *TagService) GetTags(userId string) []info.NoteTag {
+	ctx := context.Background()
+
+	tags, err := m.note_tag.FindAll(ctx, tag_repo.User(userId).WithDeleted(false).WithSort("-UpdatedTime"))
+	if err != nil {
+		log.G(ctx).WithError(err).Error("查询笔记tag失败")
+		return nil
+	}
+
+	resp := make([]info.NoteTag, 0, len(tags))
+	for _, v := range tags {
+		resp = append(resp, info.NoteTag(v.MustData(ctx)))
+	}
+
+	return resp
 }
 
 // 删除标签
 // 也删除所有的笔记含该标签的
 // 返回noteId => usn
-func (this *TagService) DeleteTag(userId string, tag string) map[string]int {
-	usn := userService.IncrUsn(userId)
-	if db.UpdateByQMap(db.NoteTags, bson.M{"UserId": bson.ObjectIdHex(userId), "Tag": tag}, bson.M{"Usn": usn, "IsDeleted": true}) {
-		return noteService.UpdateNoteToDeleteTag(userId, tag)
+func (m *TagService) DeleteTag(userId string, tag string) (resp map[string]int) {
+	ctx := context.Background()
+
+	err := updateNoteTag(m.note_tag, ctx, repository.User(userId), func(model *note_model.Tag) error {
+		if model == nil {
+			return errcode.NotFound(ctx, "notExists", userId)
+		}
+
+		if err := model.SoftDelete(ctx, true, userService.IncrUsn(userId)); err != nil {
+			return err
+		}
+
+		resp = noteService.UpdateNoteToDeleteTag(userId, tag)
+
+		return nil
+	})
+	if err != nil {
+		return nil
 	}
-	return map[string]int{}
+
+	return resp
 }
 
 // 删除标签, 供API调用
-func (this *TagService) DeleteTagApi(userId string, tag string, usn int) (ok bool, msg string, toUsn int) {
-	noteTag := info.NoteTag{}
-	db.GetByQ(db.NoteTags, bson.M{"UserId": bson.ObjectIdHex(userId), "Tag": tag}, &noteTag)
+func (m *TagService) DeleteTagApi(userId string, tag string, usn int) (ok bool, msg string, toUsn int) {
+	ctx := context.Background()
 
-	if noteTag.TagId == "" {
-		return false, "notExists", 0
+	err := updateNoteTag(m.note_tag, ctx, note_repo.TagTag(tag).WithUser(userId), func(model *note_model.Tag) error {
+		if model == nil {
+			return errcode.NotFound(ctx, "notExists", userId)
+		}
+
+		if model.MustData(ctx).Usn > usn {
+			return errcode.DeadlineExceeded(ctx, "conflict")
+		}
+
+		return model.SoftDelete(ctx, true, userService.IncrUsn(userId))
+	})
+	if err != nil {
+		return false, err.Error(), 0
 	}
-	if noteTag.Usn > usn {
-		return false, "conflict", 0
-	}
-	toUsn = userService.IncrUsn(userId)
-	if db.UpdateByQMap(db.NoteTags, bson.M{"UserId": bson.ObjectIdHex(userId), "Tag": tag}, bson.M{"Usn": usn, "IsDeleted": true}) {
-		return true, "", toUsn
-	}
-	return false, "", 0
+
+	return true, "", 0
 }
 
 // 重新统计标签的count
@@ -138,9 +171,19 @@ func (this *TagService) reCountTagCount(userId string, tags []string) {
 }
 
 // 同步用
-func (this *TagService) GeSyncTags(userId string, afterUsn, maxEntry int) []info.NoteTag {
-	noteTags := []info.NoteTag{}
-	q := db.NoteTags.Find(bson.M{"UserId": bson.ObjectIdHex(userId), "Usn": bson.M{"$gt": afterUsn}})
-	q.Sort("Usn").Limit(maxEntry).All(&noteTags)
-	return noteTags
+func (m *TagService) GeSyncTags(userId string, afterUsn, maxEntry int) []info.NoteTag {
+	ctx := context.Background()
+
+	tags, err := m.note_tag.FindAll(ctx, tag_repo.TagNexts(afterUsn).WithUser(userId).WithLimit(maxEntry))
+	if err != nil {
+		log.G(ctx).WithError(err).Error("查询笔记tag失败")
+		return nil
+	}
+
+	resp := make([]info.NoteTag, 0, len(tags))
+	for _, v := range tags {
+		resp = append(resp, info.NoteTag(v.MustData(ctx)))
+	}
+
+	return resp
 }
