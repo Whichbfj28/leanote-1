@@ -41,230 +41,230 @@ function log(o) {
 </script>
 </head>
 <body class="leanote-plugin lang-{{$.locale}}">
-	<div id="page">
-		<div id="pageInner">
+	<div class=""  id="page">
+		<div class="hero is-fullheight" >
 			<!-- 头部 -->
-			<!-- <div id="headerContainer"> -->
-            <nav id="header" class="navbar" role="navigation" aria-label="main navigation">
-                <div class="navbar-brand p-0">
-                    <a class="navbar-item pt-0" href="/" title="Leanote {{msg . "home"}}" id="logo">
-                    </a>
+			<div class="hero-head">
+				<nav  id="header" class="navbar">
+				<div class="container">
 
-                    <div id="switcher" class="pull-left">
-                        <i class="fa fa-dedent" id="leftSwitcher" title="{{msg . "leftHidden"}}"></i>
-                        <span id="leftSwitcher2" class="fa fa-indent" title="{{msg . "leftShow"}}"></span>
-                    </div>
-              
-                    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                    </a>
-                </div>
-              
-                <div id="navbarBasicExample" class="navbar-menu">
-                    <div class="navbar-start">
-                        <!-- search -->
-                        <div class="pull-left" id="searchWrap">
-                            <form class="navbar-form form-inline col-lg-2" id="searchNote">
-                                <input class="form-control" placeholder="{{msg . "SearchNote"}}" type="text" id="searchNoteInput">
-                            </form>
-                        </div>
+					<div class="navbar-brand pt-0">
+						<a class="navbar-item pt-0" href="/" title="Leanote {{msg . "home"}}" id="logo">
+						</a>
 
-                        <!-- 全局按钮 -->
-                        <div class="pull-left" style="" id="newNoteWrap">
-                            <!-- 新建笔记 -->
-                            <div id="newMyNote">
-                                <a class="new-note" id="newNoteBtn" title="{{msg . "newNote"}}">
-                                    <!--<i class="fa fa-file-o"></i>-->
-                                    <span class="new-note-text">{{msg . "newNote"}}</span>
-                                    <span class="new-note-text-abbr">{{msg . "new"}}</span>
-                                </a>
-                                <span class="new-split">|</span>
-                                <a class="new-note new-markdown" id="newNoteMarkdownBtn" title="{{msg . "newMarkdown"}}">
-                                    <!-- <i class="lea-icon icon-markdown"></i> -->
-                                    <span class="new-markdown-text">{{msg . "newMarkdown"}}</span>
-                                    <span class="new-markdown-text-abbr">Md</span>
-                                </a>
-                                <span class="for-split"> - </span>
-                                <span id="curNotebookForNewNote" notebookId=""></span>
-
-                                <!--
-                                <div class="dropdown" style="display: inline-block">
-                                    <a class="ios7-a dropdown-toggle"
-                                        id="listNotebookDropdownMenu" data-toggle="dropdown"> 
-                                        <i class="fa fa-angle-down"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-list" id="searchNotebookForAddDropdownList">
-                                        <input type="text" placeholder="{{msg . "SearchNotebook"}}" class="form-control" id="searchNotebookForAdd"/>
-                                        <ul class="clearfix" role="menu" aria-labelledby="listNotebookDropdownMenu" id="notebookNavForNewNote">
-                                        </ul>
-                                    </div>
-                                </div>
-                                -->
-
-                            </div>
-                            
-                            <!-- 只为新建别人的笔记 -->
-                            <div id="newSharedNote" style="display: none">
-                                <a id="newSharedNoteBtn" class="new-note">
-                                    <!--<i class="fa fa-file-o"></i> -->
-                                    <span class="new-note-text">{{msg . "newNote"}}</span>
-                                    <span class="new-note-text-abbr">{{msg . "new"}}</span>
-                                </a>
-                                <span class="new-split">|</span>
-                                <a id="newShareNoteMarkdownBtn" class="new-note new-markdown" title="{{msg . "newMarkdown"}}">
-                                    <span class="new-markdown-text">{{msg . "newMarkdown"}}</span>
-                                    <span class="new-markdown-text-abbr">Md</span>
-                                </a>
-                                <span class="for-split"> - </span>
-                                <span id="curNotebookForNewSharedNote" notebookId="" userId=""></span>
-
-                                <!--
-                                <div class="dropdown" style="display: inline-block">
-                                    <a id="listShareNotebookDropdownMenu" class="ios7-a dropdown-toggle" data-toggle="dropdown"> 
-                                        <i class="fa fa-angle-down"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-list" id="searchNotebookForAddShareDropdownList" >
-                                        <ul id="notebookNavForNewSharedNote"></ul>
-                                    </div>
-                                </div>
-                                -->
-                            </div>
-                        </div>
-                        
-                        <div class="pull-left" id="leanoteMsg">
-                            <span id="msg" style="display: inline-block;"></span>
-                            <span id="loading">
-                            </span>
-                        </div>
-                    </div>
-              
-                    <div class="navbar-end">
-                        <a class="navbar-item" target="_blank" href="http://lea.leanote.com">
-                            {{msg . "Explore"}}
-                        </a>
-                        <a class="navbar-item" target="_blank" id="myBlog" href="{{$.blogUrl}}/{{.userInfo.Username}}">
-                            {{msg . "myBlog"}}
-                        </a>
-                        <div class="navbar-item toggle-editor-mode" id="toggleEditorMode">
-                            <a class="" href="#writing"><span>{{msg . "writingMode"}}</span></a>
-                        </div>
-                        <div class="navbar-item">
-                            <div class="buttons">
-                            {{if eq .userInfo.Email "demo@leanote.com"}}
-                            {{if .openRegister}}		
-                            <div class="button is-info is-small is-outlined" id="demoRegister">
-                                <strong>{{msg . "demoRegister"}}</strong>
-                            </div>
-                            {{end}}
-                            {{end}}
-                        <div class="navbar-item has-dropdown is-hoverable">
-                            <a class="navbar-link"  title="{{.userInfo.Username}}">
-                                <img alt="{{.userInfo.Username}}" title="{{.userInfo.Username}}" src="{{if .userInfo.Logo}}{{.userInfo.Logo}}{{else}}/images/blog/default_avatar.png{{end}}" id="myAvatar"/> 
-                                <span>
-                                    {{.userInfo.Username}}
-                                </span>
-                            </a>
-                    
-                            <div class="navbar-dropdown">
-                              <a class="navbar-item" target="_blank" href="/member">
-                                <i class="fa fa-user"></i> 
-                                {{msg . "memberCenter"}}
-                              </a>
-                              <a class="navbar-item" role="presentation" id="setTheme">
-                                <i class="fa fa-sun-o"></i> 
-                                {{leaMsg . "Theme"}}
-                              </a>
-                              <hr class="navbar-divider">
-                              <a class="navbar-item" href="/member/blog/index" target="_blank">
-                                
-                                <i class="fa fa-bold"></i> 
-                                {{msg . "blogSet"}}
-                              </a>
-                            <a class="navbar-item my-link" target="_blank" href="{{$.userInfo.BlogUrl}}">
-                                    <i class="fa fa-bold"></i>
-                                    {{msg . "myBlog"}}
-                            </a>
-                            
-                            <li role="presentation" class="divider my-link writing-mobile-hide"></li>
-                            <li role="presentation" class="my-link toggle-editor-mode writing-mobile-hide" >
-                                <a href="#writing" title="{{msg . "writingMode"}} ctrl/cmd+e"><i class="fa fa-rocket"></i>
-                                {{msg . "writingMode"}}</a>
-                            </li>
-                            
-                            {{if .isAdmin}}
-                            <li role="presentation" class="divider"></li>
-                            <li role="presentation">
-                                <a target="_blank" title="{{msg . "admin"}}" href="/admin/index">
-                                    <i class="fa fa-dashboard"></i> 
-                                    <span>{{msg . "admin"}}</span>
-                                </a>
-                            </li>
-                            {{end}}
-
-                            <hr class="navbar-divider">
-                            <a class="navbar-item" onclick="logout()">
-                                <i class="fa fa-sign-out"></i> 
-                                {{msg . "logout"}}
-                            </a>
-
-
-                            </div>
-                          </div>
-                          
+						<div id="switcher" class="pull-left">
+							<i class="fa fa-dedent" id="leftSwitcher" title="{{msg . "leftHidden"}}"></i>
+							<span id="leftSwitcher2" class="fa fa-indent" title="{{msg . "leftShow"}}"></span>
+						</div>
 				
-                        <!--
-                        <ul id="setting" class="pull-right">
-                            <li class="dropdown messages">
-                                <a class="dropdown-toggle" data-toggle="dropdown"> 
-                                    <span aria-hidden="true" class="icon se7en-flag"></span>
-                                    <div class="sr-only">Messages</div>
-                                    <p class="counter">3</p>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#"> c@c.com 共享了笔记给你 是否接受? </a></li>
-                                    <li><a href="#"> d@c.com 共享了笔记给你 是否接受? </a></li>
-                                </ul>
-                            </li>
+						<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+							<span aria-hidden="true"></span>
+							<span aria-hidden="true"></span>
+							<span aria-hidden="true"></span>
+						</a>
+					</div>
+				
+					<div id="navbarBasicExample" class="navbar-menu">
+						<div class="navbar-start">
+							<!-- search -->
+							<div class="pull-left" id="searchWrap">
+								<form class="navbar-form form-inline col-lg-2" id="searchNote">
+									<input class="form-control" placeholder="{{msg . "SearchNote"}}" type="text" id="searchNoteInput">
+								</form>
+							</div>
 
-                            <li class="dropdown settings">
-                                <a class="dropdown-toggle" data-toggle="dropdown"> 
-                                    <span aria-hidden="true" class="icon se7en-gear"></span>
-                                    <div class="sr-only">Settings</div>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="settings-link blue"><span></span>Blue</a></li>
-                                    <li><a class="settings-link green"><span></span>Green</a></li>
-                                    <li><a class="settings-link orange"><span></span>Orange</a>
-                                    </li>
-                                    <li><a class="settings-link magenta"><span></span>Magenta</a>
-                                    </li>
-                                    <li><a class="settings-link gray"><span></span>Gray</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                        -->
-                        <div style="clear: both"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </nav>
+							<!-- 全局按钮 -->
+							<div class="pull-left" style="" id="newNoteWrap">
+								<!-- 新建笔记 -->
+								<div id="newMyNote">
+									<a class="new-note" id="newNoteBtn" title="{{msg . "newNote"}}">
+										<!--<i class="fa fa-file-o"></i>-->
+										<span class="new-note-text">{{msg . "newNote"}}</span>
+										<span class="new-note-text-abbr">{{msg . "new"}}</span>
+									</a>
+									<span class="new-split">|</span>
+									<a class="new-note new-markdown" id="newNoteMarkdownBtn" title="{{msg . "newMarkdown"}}">
+										<!-- <i class="lea-icon icon-markdown"></i> -->
+										<span class="new-markdown-text">{{msg . "newMarkdown"}}</span>
+										<span class="new-markdown-text-abbr">Md</span>
+									</a>
+									<span class="for-split"> - </span>
+									<span id="curNotebookForNewNote" notebookId=""></span>
+
+									<!--
+									<div class="dropdown" style="display: inline-block">
+										<a class="ios7-a dropdown-toggle"
+											id="listNotebookDropdownMenu" data-toggle="dropdown"> 
+											<i class="fa fa-angle-down"></i>
+										</a>
+										<div class="dropdown-menu dropdown-list" id="searchNotebookForAddDropdownList">
+											<input type="text" placeholder="{{msg . "SearchNotebook"}}" class="form-control" id="searchNotebookForAdd"/>
+											<ul class="clearfix" role="menu" aria-labelledby="listNotebookDropdownMenu" id="notebookNavForNewNote">
+											</ul>
+										</div>
+									</div>
+									-->
+
+								</div>
+								
+								<!-- 只为新建别人的笔记 -->
+								<div id="newSharedNote" style="display: none">
+									<a id="newSharedNoteBtn" class="new-note">
+										<!--<i class="fa fa-file-o"></i> -->
+										<span class="new-note-text">{{msg . "newNote"}}</span>
+										<span class="new-note-text-abbr">{{msg . "new"}}</span>
+									</a>
+									<span class="new-split">|</span>
+									<a id="newShareNoteMarkdownBtn" class="new-note new-markdown" title="{{msg . "newMarkdown"}}">
+										<span class="new-markdown-text">{{msg . "newMarkdown"}}</span>
+										<span class="new-markdown-text-abbr">Md</span>
+									</a>
+									<span class="for-split"> - </span>
+									<span id="curNotebookForNewSharedNote" notebookId="" userId=""></span>
+
+									<!--
+									<div class="dropdown" style="display: inline-block">
+										<a id="listShareNotebookDropdownMenu" class="ios7-a dropdown-toggle" data-toggle="dropdown"> 
+											<i class="fa fa-angle-down"></i>
+										</a>
+										<div class="dropdown-menu dropdown-list" id="searchNotebookForAddShareDropdownList" >
+											<ul id="notebookNavForNewSharedNote"></ul>
+										</div>
+									</div>
+									-->
+								</div>
+							</div>
+							
+							<div class="pull-left" id="leanoteMsg">
+								<span id="msg" style="display: inline-block;"></span>
+								<span id="loading">
+								</span>
+							</div>
+						</div>
+				
+						<div class="navbar-end">
+							<a class="navbar-item" target="_blank" href="http://lea.leanote.com">
+								{{msg . "Explore"}}
+							</a>
+							<a class="navbar-item" target="_blank" id="myBlog" href="{{$.blogUrl}}/{{.userInfo.Username}}">
+								{{msg . "myBlog"}}
+							</a>
+							<div class="navbar-item toggle-editor-mode" id="toggleEditorMode">
+								<a class="" href="#writing"><span>{{msg . "writingMode"}}</span></a>
+							</div>
+							<div class="navbar-item">
+								<div class="buttons">
+								{{if eq .userInfo.Email "demo@leanote.com"}}
+								{{if .openRegister}}		
+								<div class="button is-info is-small is-outlined" id="demoRegister">
+									<strong>{{msg . "demoRegister"}}</strong>
+								</div>
+								{{end}}
+								{{end}}
+							<div class="navbar-item has-dropdown is-hoverable">
+								<a class="navbar-link"  title="{{.userInfo.Username}}">
+									<img alt="{{.userInfo.Username}}" title="{{.userInfo.Username}}" src="{{if .userInfo.Logo}}{{.userInfo.Logo}}{{else}}/images/blog/default_avatar.png{{end}}" id="myAvatar"/> 
+									<span>
+										{{.userInfo.Username}}
+									</span>
+								</a>
+						
+								<div class="navbar-dropdown">
+								<a class="navbar-item" target="_blank" href="/member">
+									<i class="fa fa-user"></i> 
+									{{msg . "memberCenter"}}
+								</a>
+								<a class="navbar-item" role="presentation" id="setTheme">
+									<i class="fa fa-sun-o"></i> 
+									{{leaMsg . "Theme"}}
+								</a>
+								<hr class="navbar-divider">
+								<a class="navbar-item" href="/member/blog/index" target="_blank">
+									
+									<i class="fa fa-bold"></i> 
+									{{msg . "blogSet"}}
+								</a>
+								<a class="navbar-item my-link" target="_blank" href="{{$.userInfo.BlogUrl}}">
+										<i class="fa fa-bold"></i>
+										{{msg . "myBlog"}}
+								</a>
+								
+								<li role="presentation" class="divider my-link writing-mobile-hide"></li>
+								<li role="presentation" class="my-link toggle-editor-mode writing-mobile-hide" >
+									<a href="#writing" title="{{msg . "writingMode"}} ctrl/cmd+e"><i class="fa fa-rocket"></i>
+									{{msg . "writingMode"}}</a>
+								</li>
+								
+								{{if .isAdmin}}
+								<li role="presentation" class="divider"></li>
+								<li role="presentation">
+									<a target="_blank" title="{{msg . "admin"}}" href="/admin/index">
+										<i class="fa fa-dashboard"></i> 
+										<span>{{msg . "admin"}}</span>
+									</a>
+								</li>
+								{{end}}
+
+								<hr class="navbar-divider">
+								<a class="navbar-item" onclick="logout()">
+									<i class="fa fa-sign-out"></i> 
+									{{msg . "logout"}}
+								</a>
 
 
-			<div id="mainContainer" class="clearfix">
-				<div id="mainMask">
-					<img src="/images/loading-30.gif" />
-					<br />
-					<br />
-					loading...
+								</div>
+							</div>
+							
+					
+							<!--
+							<ul id="setting" class="pull-right">
+								<li class="dropdown messages">
+									<a class="dropdown-toggle" data-toggle="dropdown"> 
+										<span aria-hidden="true" class="icon se7en-flag"></span>
+										<div class="sr-only">Messages</div>
+										<p class="counter">3</p>
+									</a>
+									<ul class="dropdown-menu">
+										<li><a href="#"> c@c.com 共享了笔记给你 是否接受? </a></li>
+										<li><a href="#"> d@c.com 共享了笔记给你 是否接受? </a></li>
+									</ul>
+								</li>
+
+								<li class="dropdown settings">
+									<a class="dropdown-toggle" data-toggle="dropdown"> 
+										<span aria-hidden="true" class="icon se7en-gear"></span>
+										<div class="sr-only">Settings</div>
+									</a>
+									<ul class="dropdown-menu">
+										<li><a class="settings-link blue"><span></span>Blue</a></li>
+										<li><a class="settings-link green"><span></span>Green</a></li>
+										<li><a class="settings-link orange"><span></span>Orange</a>
+										</li>
+										<li><a class="settings-link magenta"><span></span>Magenta</a>
+										</li>
+										<li><a class="settings-link gray"><span></span>Gray</a></li>
+									</ul>
+								</li>
+							</ul>
+							-->
+							<div style="clear: both"></div>
+						</div>
+						</div>
+					</div>
+					</div>
 				</div>
-                
-				<div id="leftNotebook">
-					<div id="notebook">
-						<div class="folderNote opened" id="myNotebooks">
-							<div class="folderHeader clearfix">
+				</nav>
+			</div>
+
+			<!-- Hero content: will be in the middle -->
+			<div class="hero-body pl-0 pt-10 mt-3">
+				<div class="columns">
+					<div class="column is-one-quarter folderBody">
+						<aside class="menu ">
+							<p class="menu-label">
+								{{msg . "notebook"}}
+							</p>
+							<div class=" folderHeader clearfix">
 								<i class="fa fa-book pull-left fa-left"></i> 
 								<span class="pull-left">
 									{{msg . "notebook"}}
@@ -273,47 +273,61 @@ function log(o) {
 									<i class="fa  fa-plus" title="{{msg . "addNotebook"}}"></i>
 								</div>
 							</div>
-							
+									
 							<div class="folderBody">
-								<input type="text" class="form-control" id="searchNotebookForList" placeholder="{{msg . "SearchNotebook"}}"/>							
-								<ul class="ztree" id="notebookList"></ul>
-								<ul class="ztree" id="notebookListForSearch"></ul>
+										<input type="text" class="form-control" id="searchNotebookForList" placeholder="{{msg . "SearchNotebook"}}"/>							
+										<ul class="ztree menu-label" id="notebookList"></ul>
+										<ul class="ztree menu-label" id="notebookListForSearch"></ul>
 							</div>
-						</div>
-						
-						<div class="folderNote closed" id="myTag">
-							<div class="folderHeader">
-								<i class="fa fa-bookmark fa-left"></i>
-								<span>
-									{{msg . "tag"}}
-								</span>
-							</div>
-	
-							<ul class="folderBody clearfix" id="tagNav">
-								<li data-tag="red"><a> <span class="label label-red">{{msg . "red"}}</span></a></li>
-								<li data-tag="blue"><a> <span class="label label-blue">{{msg . "blue"}}</span></a></li>
-								<li data-tag="yellow"><a> <span class="label label-yellow">{{msg . "yellow"}}</span></a></li>
-								<li data-tag="green"><a> <span class="label label-green">{{msg . "green"}}</span></a></li>
-							</ul>
-						</div>
-						
-						<div class="folderNote closed" id="myShareNotebooks">
-							<div class="folderHeader">
-								<i class="fa fa-user fa-left"></i>
-								<span>
-									{{msg . "share"}}
-								</span>
-							</div>
-	
-							<ul class="folderBody" id="shareNotebooks">
 								
+							<p class="menu-label">
+								{{msg . "tag"}}
+							</p>
+							<div class="folderHeader">
+										<i class="fa fa-bookmark fa-left"></i>
+										<span>
+											{{msg . "tag"}}
+										</span>
+							</div>
+			
+							<ul class="folderBody clearfix menu-label" id="tagNav">
+										<li data-tag="red"><a> <span class="label label-red">{{msg . "red"}}</span></a></li>
+										<li data-tag="blue"><a> <span class="label label-blue">{{msg . "blue"}}</span></a></li>
+										<li data-tag="yellow"><a> <span class="label label-yellow">{{msg . "yellow"}}</span></a></li>
+									<li data-tag="green"><a> <span class="label label-green">{{msg . "green"}}</span></a></li>
 							</ul>
-						</div>
-	
-					</div>
+								
+							<p class="menu-label">
+								{{msg . "share"}}
+							</p>
+							<div class="folderHeader">
+										<i class="fa fa-user fa-left"></i>
+										<span>
+											{{msg . "share"}}
+										</span>
+							</div>
+			
+							<ul class="folderBody menu-list" id="shareNotebooks">
+										
+							</ul>
+			
+							<ul class="menu-list">
+								<li><a>Invitations</a></li>
+							<li>
+								<a class="is-active">Manage Your Team</a>
+								<ul>
+								<li><a>Members</a></li>
+								<li><a>Plugins</a></li>
+								<li><a>Add a member</a></li>
+								</ul>
+							</li>
+							</ul>
+						</aside>
+						
+				<div  class="menu" >
 					
 					<!-- 缩小版 todo 不要展示, 点击展开即可 -->
-					<div id="notebookMin">
+					<div id="">
 						<!-- 这里隐藏, 不要 -->
 						<div target="#notebookList" title="{{msg . "notebook"}}" class="minContainer">
 							<i class="fa fa-book"></i>
@@ -339,6 +353,120 @@ function log(o) {
 					</div>
 					-->
 				</div>
+					</div>
+
+					<div class="column">
+						<div class="column" id="noteList">
+						<div class="clearfix" id="notesAndSort" >
+	
+							<div class="pull-left">
+								<!-- 我的笔记本 -->
+								<div class="dropdown" id="myNotebookNavForListNav">
+									<a class="ios7-a">
+										<span id="curNotebookForListNote">{{msg . "all"}}</span>
+									</a>
+								</div>
+								
+								<!-- 共享的笔记本 -->
+								<div class="dropdown" id="sharedNotebookNavForListNav" style="display: none">
+									<a class="ios7-a">
+										<span id="curSharedNotebookForListNote">{{msg . "all"}}</span>
+									</a>
+								</div>
+							</div>
+	
+							<!-- tag search -->
+							<div class="pull-left" id="tagSearch"></div>
+	
+							<!-- sort type -->
+							<div id="sortType">
+								<div class="dropdown">
+									<a class="ios7-a dropdown-toggle" id="dropdownMenu1"
+										data-toggle="dropdown"> 
+										</i><i class="fa fa-th-list"></i>
+									</a>
+									<ul class="dropdown-menu" role="menu"
+										aria-labelledby="dropdownMenu1"
+										>
+	
+										<li role="presentation"><a data-view="snippet" class="view-style view-snippet" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Snippet View"}}
+										</a></li>
+										<li role="presentation"><a data-view="list" class="view-style view-list" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "List View"}}
+										</a></li>
+										<li role="presentation" class="divider"></li>
+										<li role="presentation"><a data-sorter="dateCreatedASC" class="sorter-style sorter-dateCreatedASC" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Date Created"}} <i class="fa fa-sort-alpha-asc"></i>
+										</a></li>
+										<li role="presentation"><a data-sorter="dateCreatedDESC" class="sorter-style sorter-dateCreatedDESC" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Date Created"}} <i class="fa fa-sort-alpha-desc"></i>
+										</a></li>
+										<li role="presentation" class="divider"></li>
+										<li role="presentation"><a data-sorter="dateUpdatedASC" class="sorter-style sorter-dateUpdatedASC" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Date Updated"}} <i class="fa fa-sort-alpha-asc"></i>
+										</a></li>
+										<li role="presentation"><a data-sorter="dateUpdatedDESC" class="sorter-style sorter-dateUpdatedDESC checked" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Date Updated"}} <i class="fa fa-sort-alpha-desc"></i>
+										</a></li>
+										<li role="presentation" class="divider"></li>
+										<li role="presentation"><a data-sorter="titleASC" class="sorter-style sorter-titleASC" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Title"}} <i class="fa fa-sort-alpha-asc"></i>
+											
+										</a></li>
+										<li role="presentation"><a data-sorter="titleDESC" class="sorter-style sorter-titleDESC" role="menuitem">
+											<i class="fa fa-check"></i>
+											{{leaMsg . "Title"}} <i class="fa fa-sort-alpha-desc"></i>
+										</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+	
+						<!-- 笔记列表 -->
+						<!-- wrap 为了slimScroll -->
+						<div id="noteItemListWrap">
+							<ul id="noteItemList">
+							</ul>
+						</div>
+						</div>
+					
+					</div>
+				</div>
+			</div>
+
+			<!-- Hero footer: will stick at the bottom -->
+			<div class="hero-foot">
+				<nav class="tabs">
+				<div class="container">
+					<ul>
+					<li class="is-active"><a>Overview</a></li>
+					<li><a>Modifiers</a></li>
+					<li><a>Grid</a></li>
+					<li><a>Elements</a></li>
+					<li><a>Components</a></li>
+					<li><a>Layout</a></li>
+					</ul>
+				</div>
+				</nav>
+			</div>
+
+
+			<div id="mainContainer" class="clearfix" style="display: none;">
+				<div id="mainMask">
+					<img src="/images/loading-30.gif" />
+					<br />
+					<br />
+					loading...
+				</div>
+                
 
 				<div class="noteSplit" id="notebookSplitter"></div>
 				
@@ -428,7 +556,7 @@ function log(o) {
 						<ul id="noteItemList">
 						</ul>
 					</div>
-				</div>
+					</div>
 				
 					<div class="noteSplit" id="noteSplitter"></div>
 					
@@ -720,7 +848,6 @@ function log(o) {
 					</div>
 				</div>	
 			</div>
-			
 			<!-- mdEditor -->
 			<!-- 插入图片 -->
 			<div class="modal fade modal-insert-image">
